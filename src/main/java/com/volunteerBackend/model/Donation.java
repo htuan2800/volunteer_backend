@@ -47,7 +47,7 @@ public class Donation {
     @Column(name = "donor_phone")
     private String donorPhone;
 
-    @Column(nullable = false, precision = 15, scale = 0)
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
     @Column(columnDefinition = "TEXT")
@@ -60,8 +60,25 @@ public class Donation {
     @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
 
-    @Column(name = "transaction_id")
-    private String transactionId;
+    // Mã đơn hàng bạn sinh ra (vnp_TxnRef)
+    @Column(name = "vnp_txn_ref", unique = true)
+    private String vnpTxnRef;
+
+    // Mã giao dịch VNPay sinh ra (vnp_TransactionNo)
+    @Column(name = "vnp_transaction_no")
+    private String vnpTransactionNo;
+
+    // Mã giao dịch ngân hàng (vnp_BankTranNo)
+    @Column(name = "vnp_bank_tran_no")
+    private String vnpBankTranNo;
+
+    // Mã ngân hàng (vnp_BankCode)
+    @Column(name = "vnp_bank_code")
+    private String vnpBankCode;
+
+    // Mã phản hồi (vnp_ResponseCode)
+    @Column(name = "vnp_response_code")
+    private String vnpResponseCode;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
@@ -70,6 +87,7 @@ public class Donation {
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
 
+    // Mã biên lai hoặc URL biên lai
     @Column(name = "receipt_url")
     private String receiptUrl;
 

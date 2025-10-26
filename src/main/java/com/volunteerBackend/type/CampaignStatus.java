@@ -1,5 +1,5 @@
 package com.volunteerBackend.type;
 
 public enum CampaignStatus {
-    PENDING, ACTIVE, COMPLETED, PAUSED, CANCELLED
+    PENDING_APPROVAL, IN_PROGRESS, REJECTED, TARGET_REACHED, PAUSED, ENDED
 }

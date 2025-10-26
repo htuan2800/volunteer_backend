@@ -11,14 +11,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class userDTO {
+public class UserDTO {
     private Integer id;
     private String fullName;
     private String email;
     private Gender gender;
     private String avatar;
+    private String phoneNumber;
     private String coverPhotoURL;
     private UserRole role;
     private LocalDateTime createdAt;
-    private Boolean isVerified;    
+    private Boolean isVerified;   
+    private Boolean isDeleted ;
+    private Boolean isActive ;
 }

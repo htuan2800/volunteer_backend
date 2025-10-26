@@ -39,10 +39,7 @@ public class Campaign {
     @Column(nullable = false, length = 500)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
-    private String description;
-
-    @Column(name = "target_amount", nullable = false, precision = 15, scale = 0)
+    @Column(name = "target_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal targetAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -57,7 +54,7 @@ public class Campaign {
     private String featuredImage;
 
     @Enumerated(EnumType.STRING)
-    private CampaignStatus status = CampaignStatus.PENDING;
+    private CampaignStatus status = CampaignStatus.PENDING_APPROVAL;
 
     @Column(name = "start_date")
     private java.time.LocalDate startDate;
@@ -68,8 +65,8 @@ public class Campaign {
     @Column(name = "story_info", columnDefinition = "TEXT")
     private String storyInfo;
 
-    @Column(columnDefinition = "JSON", nullable = true)
-    private String documents; // JSON string
+    // @Column(columnDefinition = "JSON", nullable = true)
+    // private String documents; // JSON string
 
     @Column(name = "is_featured")
     private Boolean isFeatured = false;
@@ -88,15 +85,6 @@ public class Campaign {
 
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CampaignImage> images;
-
-    // @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<CampaignUpdate> updates;
-
-    // @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<Comment> comments;
-
-    // @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<Volunteer> volunteers;
 
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ExpenseReport> expenseReports;

@@ -20,19 +20,19 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String generateToken(Authentication auth, int id) {
+    public static String generateToken(Authentication auth, User user) {
         Instant now = Instant.now();
         Date issuedAt = Date.from(now);
         Date expiration = Date.from(now.plusSeconds(3600)); // 1h
 
         return Jwts.builder()
-                .issuer("volunteer-campaign")
+                .issuer("volunteer")
                 .issuedAt(issuedAt)
                 .expiration(expiration)
                 .claim("email", auth.getName())
-                .claim("id", String.valueOf(id))
+                .claim("id", user.getId())
                 .claim("type", "access")
-                .claim("role", auth.getAuthorities())
+                .claim("role", user.getRole())
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -43,29 +43,30 @@ public class JwtProvider {
         Date expiration = Date.from(now.plusSeconds(3600)); // 1h
 
         return Jwts.builder()
-                .issuer("volunteer-campaign")
+                .issuer("volunteer")
                 .issuedAt(issuedAt)
                 .expiration(expiration)
                 .claim("email", user.getEmail())
-                .claim("id", String.valueOf(user.getId()))
+                .claim("id", user.getId())
                 .claim("type", "access")
                 .claim("role", user.getRole())
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public static String generateRefreshToken(Authentication auth, int id) {
+    public static String generateRefreshToken(Authentication auth, User user) {
         Instant now = Instant.now();
         Date issuedAt = Date.from(now);
         Date expiration = Date.from(now.plusSeconds(365L * 24 * 3600)); // 1 năm
 
         return Jwts.builder()
-                .issuer("vcbackend")
+                .issuer("volunteer")
                 .issuedAt(issuedAt)
                 .expiration(expiration)
-                .claim("email", auth.getName())
-                .claim("id", String.valueOf(id))
+                .claim("email", user.getEmail())
+                .claim("id", user.getId())
                 .claim("type", "refresh")
+                .claim("role", user.getRole())
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -85,10 +86,10 @@ public class JwtProvider {
         return String.valueOf(claims.get("email"));
     }
 
-    public static String getIdFromJwtToken(String jwt) {
+    public static Integer getIdFromJwtToken(String jwt) {
         // Remove Bearer prefix if exists
         if (jwt.startsWith("Bearer ")) {
-            jwt = jwt.substring(7); // ✅ Thêm dòng này
+            jwt = jwt.substring(7);
         }
 
         Claims claims = Jwts.parser()
@@ -97,7 +98,22 @@ public class JwtProvider {
                 .parseSignedClaims(jwt)
                 .getPayload();
 
-        return String.valueOf(claims.get("id"));
+        return (Integer) claims.get("id");
+    }
+
+    public static String getRoleFromJwtToken(String jwt) {
+        // Remove Bearer prefix if exists
+        if (jwt.startsWith("Bearer ")) {
+            jwt = jwt.substring(7);
+        }
+
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(jwt)
+                .getPayload();
+
+        return String.valueOf(claims.get("role"));
     }
 
     public static boolean validateToken(String token) { // ✅ Thêm static

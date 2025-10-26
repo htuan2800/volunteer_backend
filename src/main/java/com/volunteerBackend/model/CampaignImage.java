@@ -30,9 +30,6 @@ public class CampaignImage {
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
-    @Column(name = "publicId")
-    private String publicId;
-
     @Column(name = "sort_order")
     private Integer sortOrder = 0;
 

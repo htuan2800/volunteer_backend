@@ -3,6 +3,7 @@ package com.volunteerBackend.model;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,6 +48,10 @@ public class Notification {
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
 
     public enum NotificationType {
         DONATION, CAMPAIGN, SYSTEM

@@ -43,6 +43,9 @@ public class Category {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name="is_deleted")
+    private Boolean isDeleted = false;
+
     // Relationships
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Campaign> campaigns;

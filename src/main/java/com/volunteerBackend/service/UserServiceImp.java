@@ -1,21 +1,36 @@
 package com.volunteerBackend.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.volunteerBackend.DTO.DashboardOfUserDTO;
 import com.volunteerBackend.config.JwtProvider;
+import com.volunteerBackend.config.RabbitMQConfig;
 import com.volunteerBackend.exceptions.UserException;
+import com.volunteerBackend.model.Notification.NotificationType;
 import com.volunteerBackend.model.User;
+import com.volunteerBackend.model.UserProvider;
+import com.volunteerBackend.payload.EmailResetPayload;
+import com.volunteerBackend.payload.EmailVerifyPayload;
+import com.volunteerBackend.repository.DonationRepository;
 import com.volunteerBackend.repository.UserRepository;
+import com.volunteerBackend.request.ChangePasswordRequest;
+import com.volunteerBackend.request.NotificationRequest;
 import com.volunteerBackend.request.RegisterRequest;
+import com.volunteerBackend.request.ResetPasswordRequest;
+import com.volunteerBackend.request.UserRequest;
+import com.volunteerBackend.type.AuthProvider;
 import com.volunteerBackend.type.UserRole;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +43,9 @@ public class UserServiceImp implements UserService {
     private EmailService emailService;
 
     @Autowired
+    private DashboardStatisticsService dashboardStatisticsService;
+
+    @Autowired
     UserRepository userRepository;
 
     @Value("${app.verification.token-expiry}")
@@ -35,6 +53,38 @@ public class UserServiceImp implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private FileStorageService fileStorageService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private DonationRepository donationRepository;
+
+    @Autowired
+    private NotificationService notificationService;
+
+
+    @Override
+    public boolean createUser(User user) throws UserException {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserException("Email already exists");
+        }
+        if (userRepository.existsByPhoneNumber(user.getPhoneNumber())) {
+            throw new UserException("Phone number already exists");
+        }
+        user.setRole(UserRole.USER);
+        user.setEmail(user.getEmail().toLowerCase());
+        user.setFullName(user.getFullName().trim());
+        user.setPhoneNumber(user.getPhoneNumber().trim());
+        user.setGender(user.getGender());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        dashboardStatisticsService.updateTotalUsers();
+        return true;
+    }
 
     @Override
     public User findUserByEmail(String email) {
@@ -62,6 +112,12 @@ public class UserServiceImp implements UserService {
         }
     }
 
+    @Override
+    public User findByFullName(String username) {
+        User user = userRepository.findByFullName(username);
+        return user;
+    }
+
     private String generateVerificationToken() {
         return UUID.randomUUID().toString();
     }
@@ -79,19 +135,83 @@ public class UserServiceImp implements UserService {
         newUser.setEmail(user.getEmail());
         newUser.setRole(UserRole.USER);
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        
         newUser.setVerificationToken(token);
         newUser.setTokenExpiry(LocalDateTime.now().plus(tokenExpiryMs, ChronoUnit.MILLIS));
 
+        UserProvider userProvider = new UserProvider();
+        userProvider.setProviderName(AuthProvider.LOCAL);
+        newUser.getProviders().add(userProvider);
+        userProvider.setUser(newUser);
         User savedUser = userRepository.save(newUser);
-        emailService.sendVerificationEmailWithAsync(
-                user.getEmail(),
-                token,
-                user.getFullName()).exceptionally(ex -> {
-                    log.error("Email sending failed for user: " + user.getEmail(), ex);
-                    // Có thể thêm logic retry hoặc notification
-                    return null;
-                });
+        EmailVerifyPayload payload = new EmailVerifyPayload();
+        payload.setToken(token);
+        payload.setEmail(user.getEmail());
+        payload.setFullname(user.getFullName());
+        rabbitTemplate.convertAndSend(
+            RabbitMQConfig.EXCHANGE_USER_NAME,
+            RabbitMQConfig.ROUTING_REGISTRATION_KEY,
+            payload);
+        dashboardStatisticsService.updateTotalUsers();
         return savedUser;
+    }
+
+
+
+    @Override
+    public boolean forgotPassword(String email) throws UserException {
+        User user = findUserByEmail(email);
+        if (user == null) {
+            throw new UserException("User not found");
+        }
+        String token = generateVerificationToken();
+        user.setVerificationToken(token);
+        user.setTokenExpiry(LocalDateTime.now().plus(tokenExpiryMs, ChronoUnit.MILLIS));
+        userRepository.save(user);
+        EmailResetPayload payload = new EmailResetPayload();
+        payload.setToken(token);
+        payload.setEmail(user.getEmail());
+        payload.setFullname(user.getFullName());
+        rabbitTemplate.convertAndSend(
+                        RabbitMQConfig.EXCHANGE_USER_NAME,
+                        RabbitMQConfig.ROUTING_FORGETPASSWORD_KEY,
+                        payload);
+        return true;
+    }
+
+    @Override
+    public boolean changePassword(ChangePasswordRequest request, User user) throws UserException {
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new UserException("Mật khẩu cũ không đúng");
+        }
+        if (!request.getNewPassword().equals(request.getConfirmNewpassword())) {
+            throw new UserException("Mật khẩu xác nhận không khớp");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean resetPassword(ResetPasswordRequest request) throws UserException {
+        Optional<User> userOpt = userRepository.findByVerificationToken(request.getToken());
+
+        if (userOpt.isEmpty()) {
+            return false; // Token không tồn tại
+        }
+
+        User user = userOpt.get();
+        if (!user.getVerificationToken().equals(request.getToken())) {
+            throw new UserException("Invalid token");
+        }
+        if (user.getTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new UserException("Token expired");
+        }
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setVerificationToken(null);
+        user.setTokenExpiry(null);
+        userRepository.save(user);
+        return true;
     }
 
     @Override
@@ -100,34 +220,80 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public User updateUser(User user, Integer userId) throws UserException {
+    public boolean updateUser(UserRequest user, Integer userId) throws UserException {
         Optional<User> user1 = userRepository.findById(userId);
         if (user1.isEmpty()) {
             throw new UserException("User not found");
         }
-
         User oldUser = user1.get();
-
-        if (user.getFullName() != null) {
+        if(user.getOption().equals("COVER_IMAGE"))
+        {
+            if(oldUser.getCoverPhotoURL() != null)
+            {
+                fileStorageService.deleteFile(oldUser.getCoverPhotoURL());
+            }
+            oldUser.setCoverPhotoURL(user.getCoverPhotoURL());
+        } else if(user.getOption().equals("AVATAR_IMAGE")) {
+            if(oldUser.getAvatar() != null)
+            {
+                fileStorageService.deleteFile(oldUser.getAvatar());
+            }
+            oldUser.setAvatar(user.getAvatar());
+        }
+        else {
             oldUser.setFullName(user.getFullName());
-        }
-
-        if (user.getEmail() != null) {
-            oldUser.setEmail(user.getEmail());
-        }
-
-        if (user.getGender() != null) {
             oldUser.setGender(user.getGender());
+            oldUser.setPhoneNumber(user.getPhoneNumber());
         }
+        userRepository.save(oldUser);
+        return true;
+    }
 
-        User updatedUser = userRepository.save(oldUser);
-        return updatedUser;
+    @Override
+    public boolean updateUserByAdmin(UserRequest user, Integer userId) throws UserException {
+        Optional<User> user1 = userRepository.findById(userId);
+        if (user1.isEmpty()) {
+            throw new UserException("User not found");
+        }
+        User oldUser = user1.get();
+        oldUser.setFullName(user.getFullName());
+        oldUser.setGender(user.getGender());
+        if(user.getOption().equals("IMAGE"))
+        {
+            if(StringUtils.hasText(user.getAvatar()))
+            {
+                if(StringUtils.hasText(oldUser.getAvatar()))
+                {
+                    fileStorageService.deleteFile(oldUser.getAvatar());
+                }
+                oldUser.setAvatar(user.getAvatar());
+            }
+            if(StringUtils.hasText(user.getCoverPhotoURL()))
+            {
+                if(StringUtils.hasText(oldUser.getCoverPhotoURL()))
+                {
+                    fileStorageService.deleteFile(oldUser.getCoverPhotoURL());
+                }
+                oldUser.setCoverPhotoURL(user.getCoverPhotoURL());
+            }
+        }
+        userRepository.save(oldUser);
+        System.out.println("DONE");
+        NotificationRequest notificationRequest = new NotificationRequest();
+                notificationRequest.setUserId(oldUser.getId());
+                notificationRequest.setTitle("Thay đổi thông tin cá nhân");
+                notificationRequest.setMessage("Thông tin cá nhân của bạn đã được thay đổi vui lòng kiếm tra lại");
+                notificationRequest.setRelatedId(null);
+                notificationRequest.setType(NotificationType.SYSTEM);
+        notificationService.createNotification(notificationRequest);
+        return true;
     }
 
     @Override
     public User findUserByJwt(String Jwt) {
-        String email = JwtProvider.getEmailFromJwtToken(Jwt);
-        Optional<User> user = userRepository.findByEmail(email);
+        if(Jwt == null) return null;
+        Integer id = JwtProvider.getIdFromJwtToken(Jwt);
+        Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             return null;
         } else {
@@ -180,14 +346,45 @@ public class UserServiceImp implements UserService {
         userRepository.save(user);
 
         // Gửi lại email
-        emailService.sendVerificationEmailWithAsync(
-                user.getEmail(),
-                newToken,
-                user.getFullName()).exceptionally(ex -> {
-                    log.error("Email sending failed for user: " + user.getEmail(), ex);
-                    // Có thể thêm logic retry hoặc notification
-                    return null;
-        });
+        EmailVerifyPayload payload = new EmailVerifyPayload();
+        payload.setToken(newToken);
+        payload.setEmail(user.getEmail());
+        payload.setFullname(user.getFullName());
+        rabbitTemplate.convertAndSend(
+            RabbitMQConfig.EXCHANGE_USER_NAME,
+            RabbitMQConfig.ROUTING_REGISTRATION_KEY,
+            payload);
     }
 
+    @Override
+    public boolean changeActiveUser(Integer userId) throws UserException {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserException("User not found");
+        }
+        user.get().setIsActive(!user.get().getIsActive());
+        userRepository.save(user.get());
+        return true;
+    }
+
+    @Override
+    public boolean deleteUser(Integer userId) throws UserException {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserException("User not found");
+        }
+        user.get().setIsDeleted(true);
+        userRepository.save(user.get());
+        return true;
+    }
+
+    @Override
+    public DashboardOfUserDTO getDashboardOfUser(User user) throws UserException {
+        BigDecimal totalDonations = donationRepository.sumAmountDonationOfUser(user.getId());
+        Long totalCampaign = donationRepository.countDistinctCampaignsForDonor(user);
+        DashboardOfUserDTO dashboardOfUserDTO = new DashboardOfUserDTO();
+        dashboardOfUserDTO.setTotalDonations(totalDonations);
+        dashboardOfUserDTO.setTotalCampaigns(totalCampaign);
+        return dashboardOfUserDTO;
+    }
 }

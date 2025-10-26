@@ -18,9 +18,15 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findByPhoneNumber(String phoneNumber);
 
+    User findByFullName(String username);
+
     List<User> findAllByRoleNot(UserRole role); 
 
     Optional<User> findByVerificationToken(String token);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByPhoneNumber(String phoneNumber);
 
     @Query("SELECT u FROM User u WHERE u.fullName LIKE %:query%")
     public List<User> searchUsers(@Param("query") String query);

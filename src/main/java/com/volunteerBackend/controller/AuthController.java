@@ -1,10 +1,5 @@
 package com.volunteerBackend.controller;
-
-import java.lang.foreign.Linker.Option;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +12,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.volunteerBackend.config.JwtProvider;
+import com.volunteerBackend.exceptions.UserException;
 import com.volunteerBackend.model.User;
 import com.volunteerBackend.repository.UserRepository;
+import com.volunteerBackend.request.ChangePasswordRequest;
+import com.volunteerBackend.request.ForgorPasswordRequest;
 import com.volunteerBackend.request.LoginRequest;
 import com.volunteerBackend.request.RegisterRequest;
+import com.volunteerBackend.request.ResetPasswordRequest;
 import com.volunteerBackend.response.ApiResponse;
 import com.volunteerBackend.response.AuthResponse;
 import com.volunteerBackend.response.ErrorResponse;
@@ -53,6 +51,31 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private CustomerUserDetailsService customerUserDetailsService;
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgorPasswordRequest request) throws UserException {
+        boolean isSuccess = userService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok(new ApiResponse("Email sent successfully", isSuccess));
+    }
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, @RequestHeader(value = "Authorization", required = false) String jwt) throws UserException {
+        User user = userService.findUserByJwt(jwt);
+        boolean isSuccess = userService.changePassword(request, user);
+        if (isSuccess) {
+            return ResponseEntity.ok(new ApiResponse("Password changed successfully", true));
+        } else {
+            return ResponseEntity.badRequest().body(new ApiResponse("Password change failed", false));
+        }
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) throws UserException {
+        boolean isSuccess = userService.resetPassword(request);
+        if (isSuccess) {
+            return ResponseEntity.ok(new ApiResponse("Password reset successfully", true));
+        } else {
+            return ResponseEntity.badRequest().body(new ApiResponse("Password reset failed", false));
+        }
+    }
     @PostMapping("/signup")
     public RegisterResponse createUser(@RequestBody RegisterRequest user) throws Exception {
         User savedUser = userService.registerUser(user);
@@ -94,16 +117,18 @@ public class AuthController {
 
         if (user == null) {
             throw new BadCredentialsException("User not found");
+        } else if("ADMIN".equals((loginRequest.getRole())) && !user.getRole().equals(UserRole.ADMIN)){
+            throw new BadCredentialsException("Cannot access with this account");
         } else if (!user.getIsVerified()) {
             AuthResponse res = new AuthResponse(null, "Login failed", user.getIsVerified());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
         }
 
         // Tạo Access Token (ngắn hạn)
-        String accessToken = JwtProvider.generateToken(authentication, user.getId());
+        String accessToken = JwtProvider.generateToken(authentication, user);
 
         // Tạo Refresh Token (dài hạn)
-        String refreshToken = JwtProvider.generateRefreshToken(authentication, user.getId());
+        String refreshToken = JwtProvider.generateRefreshToken(authentication, user);
 
         // ---- Set refreshToken vào HttpOnly cookie ----
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
@@ -122,7 +147,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) throws UserException {
         // Lấy refresh token từ cookie
         Cookie[] cookies = request.getCookies(); // lấy tất cả cookie gửi kèm request
         String refreshToken = null;
@@ -143,8 +168,8 @@ public class AuthController {
         }
 
         // Giải mã refresh token → tạo access token mới
-        String userEmail = JwtProvider.getEmailFromJwtToken(refreshToken);
-        User user = userService.findUserByEmail(userEmail);
+        Integer userId = JwtProvider.getIdFromJwtToken(refreshToken);
+        User user = userService.findUserById(userId);
 
         String newAccessToken = JwtProvider.refreshAccessToken(user);
         return ResponseEntity.ok(new AuthResponse(newAccessToken, "Token refreshed", user.getIsVerified()));
