@@ -1,0 +1,678 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.2
+-- https://www.phpmyadmin.net/
+--
+-- Host: mysql:3306
+-- Generation Time: Nov 03, 2025 at 04:30 AM
+-- Server version: 9.4.0
+-- PHP Version: 8.2.27
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `volunteer_camp`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `campaigns`
+--
+
+CREATE TABLE `campaigns` (
+  `id` bigint NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `featured_image` varchar(255) DEFAULT NULL,
+  `is_featured` bit(1) DEFAULT NULL,
+  `start_date` date DEFAULT NULL,
+  `status` enum('ENDED','IN_PROGRESS','PAUSED','PENDING_APPROVAL','REJECTED','TARGET_REACHED') DEFAULT NULL,
+  `story_info` text,
+  `target_amount` decimal(15,2) NOT NULL,
+  `title` varchar(500) NOT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `category_id` bigint DEFAULT NULL,
+  `organizer_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `campaigns`
+--
+
+INSERT INTO `campaigns` (`id`, `created_at`, `end_date`, `featured_image`, `is_featured`, `start_date`, `status`, `story_info`, `target_amount`, `title`, `updated_at`, `category_id`, `organizer_id`) VALUES
+(1, '2025-10-08 12:39:14.128922', '2025-12-05', '/uploads/campaigns/fc9f7830-a8af-4562-bb5a-fd8c65088d6c.jpg', b'0', '2025-10-07', 'IN_PROGRESS', 'Bất cứ trẻ em nào cũng có những ước mơ, khao khát được học tập, được hòa nhập và có những người bạn đồng hành trên hành trình trưởng thành. Nhưng không phải em nào cũng có cơ hội ấy, đặc biệt là trẻ khuyết tật. Nếu không được đến trường, các em không chỉ mất đi cơ hội tiếp cận tri thức, mà còn đánh mất cả những cơ hội quý giá để kết bạn, để cảm nhận sự kết nối với thế giới xung quanh. Sự cô đơn, sự e dè và những rào cản vô hình có thể giữ các em lại trong thế giới của riêng mình, trong khi chỉ cần một cơ hội, một cánh cửa mở ra, tương lai và cuộc đời các em có thể thay đổi.\n\nNăm 2024, Quỹ Vì trẻ em khuyết tật Việt Nam cùng Đoàn Thanh niên Cộng sản Hồ Chí Minh Bộ Ngoại giao đã phát động Chương trình “Tiếp sức đến trường”, nhằm gây quỹ để trao tặng 1.000 học bổng và phần quà cho 1.000 học sinh khuyết tật có hoàn cảnh khó khăn tại 10 tỉnh biên giới vùng cao, mỗi học bổng trị giá 2.000.000 VND. Tổng giá trị trao tặng lên tới 2.196.400.000 VND. \n\nTiếp nối thành công trên, trong năm 2025, Quỹ tiếp tục phối hợp Đoàn TNCS Bộ Ngoại giao triển khai chương trình ý nghĩa này với mục tiêu trao tặng 1.200 học bổng, mỗi học bổng trị giá 4.000.000 VND.  Chúng tôi kêu gọi gây quỹ 200 triệu đồng trên nền tảng Givenow, tương đương 50 suất học bổng, và sẽ mở rộng kêu gọi trên các nền tảng khác nhằm lan tỏa hỗ trợ tới nhiều trẻ em khuyết tật hơn.\n\nChương trình “Tiếp sức tới trường” của Quỹ Vì trẻ em khuyết tật không chỉ mang đến sự hỗ trợ về vật chất và các điều kiện học tập cho trẻ khuyết tật, mà chính là trao cho các em cơ hội – cơ hội được học tập, được kết bạn, được hòa nhập và phát triển bình đẳng . Giáo dục không chỉ là con chữ, mà còn là cầu nối của những ước mơ và xây dựng giá trị của mỗi cá nhân. “Tiếp sức tới trường”  tiếp sức cho một hành trình học tập, tiếp sức cho những trái tim nhỏ bé được mở ra với thế giới, để mỗi đứa trẻ đều có thể tìm thấy một người bạn, một giấc mơ và một tương lai rộng mở hơn.\n\nQuỹ dự kiến sẽ trao tặng học bổng vào tháng 8 năm 2025 ngay trước thềm khai giảng năm học mới, với hy vọng những phần quà này sẽ giúp các em thêm vững tin trên con đường chinh phục tri thức và ước mơ. Mỗi hành động tiếp sức của quý vị là sẽ có thêm nhiều trẻ em khuyết tật được mở cánh cửa đến với một thế giới đầy tình yêu thương và cơ hội.', 80000000.00, 'Tiếp sức đến trường 2025', '2025-10-17 20:51:02.415899', 1, 1),
+(2, '2025-10-16 21:22:40.445415', '2025-12-30', '/uploads/campaigns/ac00d307-ed00-424b-beee-d11b43acbde7.png', b'0', '2025-10-15', 'IN_PROGRESS', 'Chiến dịch gây quỹ cộng đồng “Gom xe đạp, góp tương lai” là một hoạt động thuộc dự án “Hỗ trợ xe đạp cho trẻ em bị ảnh hưởng bởi thiên tai bão lũ” triển khai bởi Quỹ Bảo trợ trẻ em Việt Nam, phối hợp cùng các Sở Lao động Thương binh và Xã hội, Quỹ Bảo trợ trẻ em các tỉnh và các nhà tài trợ.\n\nChiến dịch đặt mục tiêu góp 500 chiếc xe đạp, tương đương số tiền 875.000.000 đồng (mỗi chiếc xe đạp có giá 1.750.000 đồng). Xe đạp sẽ được gửi đến các em học sinh có hoàn cảnh khó khăn tại các địa phương bị ảnh hưởng nặng nề bởi thiên tai.', 87500000.00, 'Gom xe đạp, góp tương lai', '2025-10-16 21:24:09.149817', 1, 2),
+(3, '2025-10-16 21:45:32.698564', '2025-10-18', '/uploads/campaigns/a4618d4f-a4ba-461e-891d-15aee0bb1d23.jpg', b'0', '2025-09-30', 'ENDED', 'Chuyến khảo sát miền Trung tháng 7 vừa qua, chúng tôi ghi nhận phần lớn người dân nghèo hơn hẳn so với trước đây. Có thể các khu du lịch, các tụ điểm vui chơi không thấy biểu hiện của sức mua suy giảm bởi một số thị dân không bị mất việc, còn phần lớn người lao động nghèo về quê, cuộc mưu sinh trở nên khó khăn hơn trước, giá cả leo thang chóng mặt.Ở những cơ sở từ thiện xã hội tại các tỉnh nghèo như Quảng Trị, Gia Lai v.v… cuộc sống vô cùng khó khăn. Người đến thăm viếng và tặng quà ít đi hẳn, giảm sút rất nhiều khiến nguồn thu không có. Các ma sơ chạy vạy đủ cách, chế biến trà gừng, bột ngũ cốc bán vài chục ngàn mong cải thiện bữa ăn cho các cháu mồ côi hoặc người dân tộc thất học. 68 trẻ em đang được nuôi dưỡng tại 2 mái ấm Lâm Bích và Cam Lộ, Quảng Trị chật vật từng bữa ăn, mái ấm tận dụng mọi nguồn thực phẩm được hỗ trợ hoặc sẵn có nhưng chất lượng bữa ăn của trẻ tại đây cũng chưa thể ổn định.\n\nChúng tôi sẽ hỗ trợ mỗi trẻ 1 hộp sữa/ngày để bổ sung dinh dưỡng cho sự phát triển của trẻ, có những trẻ sơ sinh nguồn dinh dưỡng duy nhất cũng chỉ từ sữa nên việc cung cấp sữa vô cùng cấp thiết. Bên cạnh đó, chúng tôi cũng sẽ hỗ trợ nhu yếu phẩm, thực phẩm khô cho 32 trẻ tại mái ấm Cam Lộ nơi mà 32 trẻ chỉ ăn 0.5kg thịt/ngày thì việc uống sữa hay cơm có thịt với trẻ lại càng không mơ đến.', 30000000.00, 'Hỗ trợ sữa cho 68 trẻ em tại mái ấm ở Quảng Trị', '2025-10-20 00:01:00.124502', 6, 4),
+(4, '2025-10-16 21:48:22.352281', '2025-11-20', '/uploads/campaigns/acf2c3b2-b8ec-402d-9529-8d3db0b3593a.jpg', b'0', '2025-09-30', 'IN_PROGRESS', 'Điểm trường mầm non bản Mông thuộc xã Sơn Thủy, huyện Quan Sơn, tỉnh Thanh Hóa là điểm trường có số lượng học sinh lớn, nhu cầu học tập cao. Bản Mông có gần 80 em học sinh mẫu giáo và cấp một, trong đó có gần 60 em nhỏ đã đến tuổi đi học mầm non. Thế nhưng điều kiện cơ sở vật chất không thể đáp ứng nên nhiều em vẫn chưa được đến trường và các em chưa được tiếp cận với nền giáo dục đảm bảo chất lượng.', 100000000.00, 'Cùng hỗ trợ xây dựng điểm trường mầm non cho các em học sinh dân tộc Bản Mông, xã Sơn Thủy, huyện Quan Sơn, tỉnh Thanh Hóa', '2025-10-16 21:48:22.352281', 6, 3),
+(5, '2025-10-27 10:56:46.151982', '2025-12-30', '/uploads/campaigns/b88ad4bd-8dec-4500-8c5f-c51bef16df43.jpg', b'0', '2025-10-26', 'IN_PROGRESS', 'Chương trình đặt mục tiêu nâng cao nhận thức, tầm soát và điều trị kịp thời các bệnh lý về mắt cho người cao tuổi, phấn đấu trên 90% cán bộ Hội được tập huấn, trên 90% người cao tuổi được khám, cấp thuốc và 100% trường hợp đục thủy tinh thể được điều trị. Năm 2025, chương trình tập trung triển khai tại 02 tỉnh/thành phố có tỷ lệ dân số thuộc địa bàn vùng sâu, vùng xa, vùng khó khăn, vùng dân tộc thiểu số, miền núi, hải đảo.', 200000000.00, 'Mắt sáng dành tặng Người cao tuổi có hoàn cảnh khó khăn', '2025-10-27 10:57:03.942788', 5, 7),
+(6, '2025-10-28 15:02:24.248393', '2025-12-30', '/uploads/campaigns/2d416a52-247d-4a90-9a93-e3464cffc466.jpg', b'0', '2025-10-26', 'IN_PROGRESS', 'Tiền thuê đất, thuê nhà – không hề nhẹ.\nNhưng nếu mình gồng gánh được thêm một tháng, thì nghĩa là có thêm một tháng các cụ không phải co ro dưới mái hiên lạ.\n\nMột gian nhà nhỏ, vài chiếc giường gọn gàng, một bếp cơm ấm lửa, và mấy bộ đồ cũ được gấp ngay ngắn. Vậy mà, với các ông bà – đó là \"chỗ trọ của đời mình\", nơi không còn phải lo hôm nay ngủ đâu, mai trốn mưa chỗ nào.', 15000000.00, 'Gây quỹ chi trả tiền thuê không gian sống cho các ông bà neo đơn', '2025-10-28 15:03:00.225464', 5, 7),
+(7, '2025-10-28 15:21:01.351244', '2025-12-30', '/uploads/campaigns/662ff8d0-93e0-4d26-95f2-19956936abdc.jpg', b'0', '2025-09-30', 'IN_PROGRESS', 'Bếp xin được gieo duyên kêu gọi sự hảo tâm của các Mạnh Thường Quân, các xưởng bánh ngọt ủng hộ thực phẩm, hỗ trợ tài chính...để bếp có thể tiếp tục công việc trao tặng yêu thương ý nghĩa này được lâu dài hơn cho các bệnh nhân.', 20000000.00, 'Ủng hộ bánh sữa từ thiện cho các bệnh nhân k viện ung bướu Hà Nội', '2025-10-28 15:21:31.113666', 5, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `campaign_images`
+--
+
+CREATE TABLE `campaign_images` (
+  `id` bigint NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `image_url` varchar(255) NOT NULL,
+  `sort_order` int DEFAULT NULL,
+  `campaign_id` bigint NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `campaign_images`
+--
+
+INSERT INTO `campaign_images` (`id`, `created_at`, `image_url`, `sort_order`, `campaign_id`) VALUES
+(1, '2025-10-08 12:39:14.140169', '/uploads/campaigns/cd618255-0c96-420d-8511-76d5df62b04f.png', 1, 1),
+(2, '2025-10-08 12:39:14.140169', '/uploads/campaigns/ad261fb4-4a60-4074-a82a-cb96528bbda1.jpg', 2, 1),
+(3, '2025-10-08 12:39:14.140169', '/uploads/campaigns/fc9f7830-a8af-4562-bb5a-fd8c65088d6c.jpg', 0, 1),
+(5, '2025-10-16 21:22:40.495267', '/uploads/campaigns/ac00d307-ed00-424b-beee-d11b43acbde7.png', 0, 2),
+(6, '2025-10-16 21:23:29.978374', '/uploads/campaigns/34da6c60-3e17-4613-965a-de532e46522b.jpg', 1, 2),
+(7, '2025-10-16 21:23:29.987098', '/uploads/campaigns/98c4fca1-2a50-4b39-b78d-65a9b835c30c.jpg', 2, 2),
+(8, '2025-10-16 21:45:32.710318', '/uploads/campaigns/a4618d4f-a4ba-461e-891d-15aee0bb1d23.jpg', 0, 3),
+(9, '2025-10-16 21:48:22.366054', '/uploads/campaigns/acf2c3b2-b8ec-402d-9529-8d3db0b3593a.jpg', 0, 4),
+(10, '2025-10-27 10:56:46.167789', '/uploads/campaigns/b88ad4bd-8dec-4500-8c5f-c51bef16df43.jpg', 0, 5),
+(11, '2025-10-28 15:02:24.278159', '/uploads/campaigns/2d416a52-247d-4a90-9a93-e3464cffc466.jpg', 0, 6),
+(12, '2025-10-28 15:03:00.235621', '/uploads/campaigns/39ea675f-7a73-4e34-b0c6-23fd74b18a29.jpg', 1, 6),
+(13, '2025-10-28 15:11:23.431185', '/uploads/campaigns/6da5e191-fb85-40ae-8fc7-b7f4111ed669.jpg', 2, 6),
+(14, '2025-10-28 15:21:01.363217', '/uploads/campaigns/662ff8d0-93e0-4d26-95f2-19956936abdc.jpg', 0, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` bigint NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `description` text,
+  `is_active` bit(1) DEFAULT NULL,
+  `is_deleted` bit(1) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`id`, `created_at`, `description`, `is_active`, `is_deleted`, `name`, `slug`) VALUES
+(1, '2025-10-08 12:35:35.198968', 'Vì tương lại trẻ em', b'1', b'0', 'Trẻ em', 'tre-em'),
+(2, '2025-10-08 12:36:07.637186', 'Vì môi trường', b'1', b'0', 'Môi trường', 'moi-truong'),
+(3, '2025-10-08 18:00:09.624855', 'Cùng san sẻ', b'1', b'0', 'Xóa đói', 'xoa-doi'),
+(4, '2025-10-08 18:01:05.052984', 'Cùng san sẻ', b'1', b'0', 'Xóa nghèo', 'xoa-ngheo'),
+(5, '2025-10-10 09:46:40.958476', 'Cùng nhau san sẻ', b'1', b'0', 'Người già', 'nguoi-gia'),
+(6, '2025-10-16 21:34:40.840163', 'Vì một cộng đồng', b'1', b'0', 'Cộng đồng', 'cong-ong'),
+(7, '2025-10-17 18:29:52.313598', 'Cùng nhau san sẻ', b'1', b'0', 'Hoàn cảnh khó khăn', 'hoan-canh-kho-khan'),
+(8, '2025-10-17 18:30:10.348391', 'Cùng nhau san sẻ', b'1', b'0', 'Người già neo đơn', 'nguoi-gia-neo-on'),
+(9, '2025-10-17 18:30:39.471833', 'Cùng nhau san sẻ', b'1', b'0', 'Động vật hoang dã', 'ong-vat-hoang-da'),
+(10, '2025-10-17 18:30:55.714282', 'Cùng nhau san sẻ', b'1', b'0', 'Thiên tai', 'thien-tai'),
+(11, '2025-10-17 18:31:37.789479', 'Cùng nhau san sẻ', b'1', b'0', 'Người vô gia cư', 'nguoi-vo-gia-cu');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chat`
+--
+
+CREATE TABLE `chat` (
+  `id` int NOT NULL,
+  `chat_image` varchar(255) DEFAULT NULL,
+  `chat_name` varchar(255) DEFAULT NULL,
+  `chat_type` enum('AI','CUSTOMER') DEFAULT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `session_id` varchar(255) NOT NULL,
+  `user_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `chat`
+--
+
+INSERT INTO `chat` (`id`, `chat_image`, `chat_name`, `chat_type`, `created_at`, `session_id`, `user_id`) VALUES
+(1, NULL, 'Chat với AI', 'AI', '2025-10-08 12:40:25.000000', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 1),
+(2, NULL, NULL, 'CUSTOMER', '2025-10-27 10:33:49.568175', 'e8576d46-69fa-437e-a7c8-c54b3c36549a', 5),
+(3, NULL, NULL, 'CUSTOMER', '2025-10-27 10:58:11.455480', '0261998b-e0b7-4e21-af4b-7ec7a880e6cd', 8),
+(4, NULL, NULL, 'AI', '2025-11-03 10:38:44.860867', '2a1d66c5-687a-4a07-9d4d-9f53230657db', 5);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dashboard_statistics`
+--
+
+CREATE TABLE `dashboard_statistics` (
+  `id` bigint NOT NULL,
+  `total_campaigns` int DEFAULT NULL,
+  `donations_amount` decimal(15,2) NOT NULL,
+  `total_organizers` int DEFAULT NULL,
+  `total_support_count` int DEFAULT NULL,
+  `total_users` int DEFAULT NULL,
+  `up_date_time` datetime(6) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `dashboard_statistics`
+--
+
+INSERT INTO `dashboard_statistics` (`id`, `total_campaigns`, `donations_amount`, `total_organizers`, `total_support_count`, `total_users`, `up_date_time`) VALUES
+(1, 7, 110000.00, 7, 2, 2, '2025-10-31 23:32:14.618629');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `donations`
+--
+
+CREATE TABLE `donations` (
+  `id` bigint NOT NULL,
+  `amount` decimal(12,2) NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `donor_email` varchar(255) DEFAULT NULL,
+  `donor_name` varchar(255) DEFAULT NULL,
+  `donor_phone` varchar(255) DEFAULT NULL,
+  `is_anonymous` bit(1) DEFAULT NULL,
+  `message` text,
+  `payment_date` datetime(6) DEFAULT NULL,
+  `payment_method` enum('BANK_TRANSFER','CASH','MOMO','VNPAY','ZALOPAY') NOT NULL,
+  `payment_status` enum('COMPLETED','FAILED','PENDING','REFUNDED') DEFAULT NULL,
+  `receipt_url` varchar(255) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `vnp_bank_code` varchar(255) DEFAULT NULL,
+  `vnp_bank_tran_no` varchar(255) DEFAULT NULL,
+  `vnp_response_code` varchar(255) DEFAULT NULL,
+  `vnp_transaction_no` varchar(255) DEFAULT NULL,
+  `vnp_txn_ref` varchar(255) DEFAULT NULL,
+  `campaign_id` bigint NOT NULL,
+  `donor_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `donations`
+--
+
+INSERT INTO `donations` (`id`, `amount`, `created_at`, `donor_email`, `donor_name`, `donor_phone`, `is_anonymous`, `message`, `payment_date`, `payment_method`, `payment_status`, `receipt_url`, `updated_at`, `vnp_bank_code`, `vnp_bank_tran_no`, `vnp_response_code`, `vnp_transaction_no`, `vnp_txn_ref`, `campaign_id`, `donor_id`) VALUES
+(1, 100000.00, '2025-10-27 11:19:24.003597', 'huynhsmash2468@gmail.com', 'tuan huynh', '0938124403', b'1', 'God bless you', '2025-10-27 11:22:13.000000', 'VNPAY', 'COMPLETED', NULL, '2025-10-27 11:20:37.217961', 'NCB', 'VNP15220420', '00', '15220420', '22802294', 5, 8),
+(4, 10000.00, '2025-10-31 23:31:46.744680', 'huynhngoctuan369@gmail.com', 'Huỳnh Tuấn', '0938124402', b'1', 'Xin chào', '2025-10-31 23:32:12.000000', 'VNPAY', 'COMPLETED', NULL, '2025-10-31 23:32:14.548625', 'NCB', 'VNP15230745', '00', '15230745', '07243978', 5, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `expense_reports`
+--
+
+CREATE TABLE `expense_reports` (
+  `id` bigint NOT NULL,
+  `amount` decimal(15,0) NOT NULL,
+  `category` varchar(100) DEFAULT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `description` text,
+  `expense_date` date NOT NULL,
+  `receipt_url` varchar(255) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `campaign_id` bigint NOT NULL,
+  `created_by` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `messages`
+--
+
+CREATE TABLE `messages` (
+  `id` int NOT NULL,
+  `content` longtext,
+  `message_type` enum('ASSISTANT','SYSTEM','TOOL','USER') NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
+  `chat_id` int DEFAULT NULL,
+  `user_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `content`, `message_type`, `timestamp`, `chat_id`, `user_id`) VALUES
+(1, 'tổng số chiến dịch hiện tại ?', 'USER', '2025-10-24 18:26:31.717604', 1, 1),
+(2, 'Đã xảy ra lỗi: HTTP 401 - {\n    \"error\": {\n        \"message\": \"Incorrect API key provided: AIzaSyCk***************************R4Ls. You can find your API key at https://platform.openai.com/account/api-keys.\",\n        \"type\": \"invalid_request_error\",\n        \"param\": null,\n        \"code\": \"invalid_api_key\"\n    }\n}\n', 'ASSISTANT', '2025-10-24 18:26:32.575840', 1, NULL),
+(3, 'tổng số chiến dịch hiện tại ?', 'USER', '2025-10-24 18:37:30.533259', 1, 1),
+(4, 'Đã xảy ra lỗi: HTTP 404 - No response body available', 'ASSISTANT', '2025-10-24 18:37:30.837453', 1, NULL),
+(5, 'tổng số chiến dịch hiện tại ?', 'USER', '2025-10-24 18:42:36.132210', 1, 1),
+(6, 'Đã xảy ra lỗi: HTTP 400 - [{\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"API key not valid. Please pass a valid API key.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"API_KEY_INVALID\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"generativelanguage.googleapis.com\"\n        }\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.LocalizedMessage\",\n        \"locale\": \"en-US\",\n        \"message\": \"API key not valid. Please pass a valid API key.\"\n      }\n    ]\n  }\n}\n]', 'ASSISTANT', '2025-10-24 18:42:36.435192', 1, NULL),
+(7, 'tổng số chiến dịch hiện tại ?', 'USER', '2025-10-24 18:43:43.100397', 1, 1),
+(8, 'Tổng số chiến dịch hiện tại là 3 đó bạn!', 'ASSISTANT', '2025-10-24 18:43:45.770449', 1, NULL),
+(9, 'tổng số danh mục hiện tại ?', 'USER', '2025-10-24 18:47:18.226932', 1, 1),
+(10, 'Hiện tại có tổng cộng 11 danh mục bạn nhé!', 'ASSISTANT', '2025-10-24 18:47:20.241796', 1, NULL),
+(11, 'thông tin về chiến dịch Tiếp sức đến trường 2025 ?', 'USER', '2025-10-24 18:47:50.631061', 1, 1),
+(12, 'Chào bạn, chiến dịch \"Tiếp sức đến trường 2025\" của Quỹ Vì trẻ em khuyết tật Việt Nam rất ý nghĩa đó! Mục tiêu là trao tặng 1.200 học bổng cho trẻ em khuyết tật, mỗi suất trị giá 4 triệu đồng. Riêng trên trang web này, Quỹ kêu gọi quyên góp 80 triệu đồng, tương đương 20 suất học bổng. Dự kiến trao học bổng vào tháng 8/2025, trước thềm năm học mới đó bạn.', 'ASSISTANT', '2025-10-24 18:47:57.259766', 1, NULL),
+(13, 'hôm nay có bao nhiêu lượt ủng hộ ?', 'USER', '2025-10-25 11:03:59.513516', 1, 1),
+(14, 'Hôm nay chưa có ai ủng hộ bạn ạ.', 'ASSISTANT', '2025-10-25 11:04:02.268175', 1, NULL),
+(15, 'hôm nay có ai đăng ký tài khoản không ?', 'USER', '2025-10-25 11:06:46.390286', 1, 1),
+(16, 'Chào bạn, hôm nay có 1 người đăng ký tài khoản mới đó ạ!', 'ASSISTANT', '2025-10-25 11:06:50.011379', 1, NULL),
+(17, 'thông tin về những người đăng ký tài khoản hôm nay ?', 'USER', '2025-10-25 11:07:17.268518', 1, 1),
+(18, 'Chào bạn, hiện tại tôi chỉ có thông tin về một người đăng ký tài khoản vào ngày 25/10/2025, đó là anh Nguyễn Văn An với email huynhken2468@gmail.com. Số điện thoại của anh ấy chưa được cung cấp.', 'ASSISTANT', '2025-10-25 11:07:19.578252', 1, NULL),
+(19, 'ní hảo', 'USER', '2025-10-27 10:45:28.627714', 2, 5),
+(20, 'xin chào bạn', 'USER', '2025-10-27 10:58:22.758090', 3, 8),
+(21, 'dạ chào bạn ạ', 'USER', '2025-10-27 10:58:43.785084', 3, 1),
+(22, 'thông tin về user có email huynhsmash2468@gmail.com ?', 'USER', '2025-11-02 16:37:42.596547', 1, 1),
+(23, 'Chào bạn, mình thấy thông tin về người dùng có email huynhsmash2468@gmail.com như sau:\n\n*   **ID:** 8\n*   **Tên đầy đủ:** tuan huynh\n*   **Email:** huynhsmash2468@gmail.com\n*   **Trạng thái:** Đã kích hoạt (active) và đã xác minh (verified)\n*   **Vai trò:** Người dùng (USER)\n\nNgoài ra, mình không có thông tin về giới tính (gender) và số điện thoại (phone_number) của người dùng này.', 'ASSISTANT', '2025-11-02 16:37:47.374922', 1, NULL),
+(24, 'hôm nay có ai quyên góp (donations) không ?', 'USER', '2025-11-02 16:38:56.211016', 1, 1),
+(25, 'Dạ, hôm nay chưa có ai quyên góp ạ.', 'ASSISTANT', '2025-11-02 16:38:58.450089', 1, NULL),
+(26, 'ai là người donate cuối cùng trong hệ thống ?', 'USER', '2025-11-02 16:43:47.653823', 1, 1),
+(27, 'Lỗi khi thực hiện truy vấn: StatementCallback; bad SQL grammar [SELECT\n  u.id,\n  u.user_name\nFROM users AS u\nORDER BY\n  u.created_at DESC\nLIMIT 1;]', 'ASSISTANT', '2025-11-02 16:43:49.062240', 1, NULL),
+(28, 'thông tin về user có email huynhsmash2468@gmail.com ?', 'USER', '2025-11-02 17:25:17.322297', 1, 1),
+(29, 'Chào bạn, mình tìm thấy thông tin của người dùng có email huynhsmash2468@gmail.com rồi đây:\n\n*   **ID:** 8\n*   **Tên đầy đủ:** tuan huynh\n*   **Email:** huynhsmash2468@gmail.com\n*   **Trạng thái:** Đã kích hoạt và xác minh tài khoản.\n*   **Vai trò:** Người dùng (USER)\n\nCác thông tin khác như ảnh đại diện, ảnh bìa, giới tính, số điện thoại và mật khẩu hiện chưa có.', 'ASSISTANT', '2025-11-02 17:25:21.010918', 1, NULL),
+(30, 'thông tin về chiến dịch Tiếp sức đến trường 2025 ?', 'USER', '2025-11-02 17:25:28.534494', 1, 1),
+(31, 'Chào bạn, đây là thông tin về chiến dịch \"Tiếp sức đến trường 2025\":\n\nChiến dịch này nhằm trao tặng 1.200 học bổng (mỗi suất trị giá 4 triệu đồng) cho trẻ em khuyết tật có hoàn cảnh khó khăn. Quỹ đang kêu gọi quyên góp 200 triệu đồng trên Givenow, tương đương 50 suất học bổng. Dự kiến, học bổng sẽ được trao vào tháng 8/2025, trước thềm năm học mới. Mục tiêu của chiến dịch là giúp các em có cơ hội học tập, hòa nhập và phát triển.', 'ASSISTANT', '2025-11-02 17:25:30.761945', 1, NULL),
+(32, 'tổng số chiến dịch hiện tại ?', 'USER', '2025-11-02 17:26:01.870851', 1, 1),
+(33, 'Hiện tại có tổng cộng 6 chiến dịch bạn nhé!', 'ASSISTANT', '2025-11-02 17:26:03.737079', 1, NULL),
+(34, 'tóm tắt chính sách ?', 'USER', '2025-11-03 10:46:58.448080', 4, 5),
+(35, 'Chào bạn, đây là tóm tắt chính sách của App Thiện Nguyện, liên quan đến chiến dịch \"Mắt sáng dành tặng Người cao tuổi có hoàn cảnh khó khăn\" với mục tiêu quyên góp 200 triệu đồng:\n\n*   **Thay đổi chính sách:** App có thể thay đổi nội dung trang này và sẽ thông báo trước 7 ngày. Nếu bạn không có phản hồi gì trong 7 ngày đó, bạn sẽ đồng ý với các thay đổi này.\n*   **Chia sẻ thông tin cá nhân:** App sẽ giữ bí mật thông tin của bạn, trừ khi có yêu cầu từ cơ quan nhà nước, để bảo vệ quyền lợi của App, trong tình huống khẩn cấp hoặc khi bạn đồng ý chia sẻ.\n\nHy vọng thông tin này hữu ích cho bạn!', 'ASSISTANT', '2025-11-03 10:47:06.906570', 4, NULL),
+(36, 'ní hảo ma', 'USER', '2025-11-03 10:50:58.560693', 2, 1),
+(37, 'hôm nay có ai quyên góp ?', 'USER', '2025-11-03 10:51:24.287192', 1, 1),
+(38, 'Không tìm thấy dữ liệu cho câu hỏi của bạn.', 'ASSISTANT', '2025-11-03 10:51:25.547295', 1, NULL),
+(39, 'hôm nay có ai quyên góp không ?', 'USER', '2025-11-03 10:51:39.747838', 1, 1),
+(40, 'Không tìm thấy dữ liệu cho câu hỏi của bạn.', 'ASSISTANT', '2025-11-03 10:51:41.056908', 1, NULL),
+(41, 'tổng số chiến dịch hiện tại ?', 'USER', '2025-11-03 10:52:06.703024', 1, 1),
+(42, 'Tổng số chiến dịch hiện tại là 6 đó bạn. 😊', 'ASSISTANT', '2025-11-03 10:52:08.493273', 1, NULL),
+(43, 'Chính sách về chia sẻ thông tin cá nhân ?', 'USER', '2025-11-03 11:00:25.248762', 4, 5),
+(44, 'Chào bạn, về chính sách chia sẻ thông tin cá nhân trên App Thiện Nguyện thì mình tóm tắt thế này nhé:\n\n*   **Nguyên tắc chung:** App Thiện Nguyện rất coi trọng việc bảo mật thông tin của bạn và sẽ không chia sẻ thông tin cá nhân của bạn cho bên thứ ba, trừ một số trường hợp đặc biệt.\n\n*   **Các trường hợp có thể chia sẻ:**\n    *   Khi có yêu cầu từ cơ quan nhà nước có thẩm quyền (theo luật).\n    *   Khi cần thiết để bảo vệ quyền lợi của App Thiện Nguyện trước pháp luật.\n    *   Trong tình huống khẩn cấp để bảo vệ an toàn cho người khác trên app.\n    *   **Và quan trọng nhất là khi bạn đồng ý.**\n\nVậy nên, bạn hoàn toàn có thể yên tâm là thông tin của bạn sẽ được bảo vệ cẩn thận trên App Thiện Nguyện.', 'ASSISTANT', '2025-11-03 11:00:30.661652', 4, NULL),
+(45, 'chiến dịch có mục tiêu (target_amount) lớn nhất trong hệ thống ?', 'USER', '2025-11-03 11:03:16.648174', 1, 1),
+(46, 'Chào bạn, chiến dịch \"Mắt sáng dành tặng Người cao tuổi có hoàn cảnh khó khăn\" đang có mục tiêu lớn nhất trong hệ thống, với số tiền kêu gọi là 200 triệu đồng. Chương trình này tập trung vào việc hỗ trợ người cao tuổi có hoàn cảnh khó khăn trong việc chăm sóc sức khỏe mắt.', 'ASSISTANT', '2025-11-03 11:03:19.046066', 1, NULL),
+(47, 'có chiến dịch nào liên quan đến người già không ?', 'USER', '2025-11-03 11:05:03.072611', 4, 5),
+(48, 'Dạ có ạ! Bên mình có hai chiến dịch rất ý nghĩa dành cho người lớn tuổi đó là:\n\n*   **Gây quỹ chi trả tiền thuê không gian sống cho các ông bà neo đơn:** Chiến dịch này giúp các cụ có một chỗ ở ổn định, không phải lo lắng về việc ngủ ở đâu hay trốn mưa ở chỗ nào.\n*   **Mắt sáng dành tặng Người cao tuổi có hoàn cảnh khó khăn:** Chiến dịch này giúp các cụ được khám mắt, cấp thuốc và điều trị các bệnh về mắt, đặc biệt là đục thủy tinh thể. Mục tiêu là giúp thật nhiều cụ có thể nhìn rõ hơn ạ.', 'ASSISTANT', '2025-11-03 11:05:04.939800', 4, NULL),
+(49, 'có chiến dịch nào cho trẻ em không ?', 'USER', '2025-11-03 11:09:18.371947', 4, 5),
+(50, 'À, có chiến dịch \"Gom xe đạp, góp tương lai\" đó bạn. Chiến dịch này nhằm quyên góp xe đạp cho các em nhỏ có hoàn cảnh khó khăn, đặc biệt là các em bị ảnh hưởng bởi thiên tai. Mục tiêu là gom được 500 chiếc xe, tương đương 875 triệu đồng đó!', 'ASSISTANT', '2025-11-03 11:09:20.788193', 4, NULL),
+(51, 'có bao nhiêu người dùng trong hệ thống ?', 'USER', '2025-11-03 11:16:59.063699', 1, 1),
+(52, 'Có 4 người dùng trong hệ thống bạn nhé!', 'ASSISTANT', '2025-11-03 11:17:09.913185', 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `news`
+--
+
+CREATE TABLE `news` (
+  `id` bigint NOT NULL,
+  `content` longtext NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `featured_image` varchar(255) DEFAULT NULL,
+  `is_featured` bit(1) DEFAULT NULL,
+  `published_at` datetime(6) DEFAULT NULL,
+  `slug` varchar(500) NOT NULL,
+  `status` enum('DRAFT','PUBLISHED') DEFAULT NULL,
+  `title` varchar(500) NOT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `view_count` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` bigint NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `is_read` bit(1) DEFAULT NULL,
+  `message` text NOT NULL,
+  `read_at` datetime(6) DEFAULT NULL,
+  `related_id` bigint DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `type` enum('CAMPAIGN','DONATION','SYSTEM') DEFAULT NULL,
+  `user_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `created_at`, `is_read`, `message`, `read_at`, `related_id`, `title`, `type`, `user_id`) VALUES
+(1, '2025-10-27 11:20:37.320224', b'1', 'Bạn đã thanh toán thành công số tiền cho dự án Mắt sáng dành tặng Người cao tuổi có hoàn cảnh khó khăn', '2025-10-27 11:20:42.972186', 5, 'Mắt sáng dành tặng Người cao tuổi có hoàn cảnh khó khăn', 'DONATION', 8);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `organizers`
+--
+
+CREATE TABLE `organizers` (
+  `organizer_id` int NOT NULL,
+  `description` longtext NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `hotline` varchar(255) DEFAULT NULL,
+  `active` bit(1) DEFAULT NULL,
+  `is_deleted` bit(1) DEFAULT NULL,
+  `logo_url` varchar(255) DEFAULT NULL,
+  `name` varchar(500) NOT NULL,
+  `slug` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `organizers`
+--
+
+INSERT INTO `organizers` (`organizer_id`, `description`, `email`, `hotline`, `active`, `is_deleted`, `logo_url`, `name`, `slug`) VALUES
+(1, 'Quỹ Vì trẻ em khuyết tật Việt Nam là một tổ chức phi lợi nhuận, hoạt động trong lĩnh vực từ thiện, nhân đạo. Quỹ ra đời với mục đích làm cầu nối giữa các tổ chức, nhà hảo tâm với những trẻ em không may bị khuyết tật, di chứng chất độc da cam, nhằm chăm sóc, bảo vệ, giúp đỡ cuộc sống của các em, tạo điều kiện cho các em phát triển tối đa tiềm năng bản thân để có thể hòa nhập với cộng đồng.', 'quyvitreemkhuyettat@gmail.com', '0865019639', b'1', b'0', '/uploads/organizers/782409ef-4a6f-49c9-8dde-a2686047eede.jpg', 'Quỹ Vì trẻ em khuyết tật Việt Nam', 'quyvitreemkhuyettat'),
+(2, 'Quỹ Bảo trợ trẻ em Việt Nam (Quỹ BTTEVN) là Quỹ duy nhất của nhà nước được thành lập ngày 04/5/1992 theo Luật Bảo vệ, chăm sóc và giáo dục trẻ em (nay là Luật trẻ em 2016) để huy động nguồn lực trong nước và quốc tế hỗ trợ thực hiện các mục tiêu vì trẻ em của Chính phủ Việt Nam – Thực hiện Quyền trẻ em theo Công ước Quyền trẻ em mà Việt Nam đã ký và phê chuẩn (1990)', 'quytreemvn@molisa.gov.vn', '02438458568', b'1', b'0', '/uploads/organizers/a32db649-4789-4ce4-8ccd-c03727ff13a5.png', 'Quỹ Bảo trợ trẻ em Việt Nam', 'quybaotrotreemvietnam'),
+(3, 'Đoàn Thanh niên cơ quan Trung ương Đoàn là tổ chức chính trị - xã hội, có vai trò đoàn kết và tập hợp các đoàn viên của các đơn vị trực thuộc cơ quan Trung ương đoàn. Đoàn Thanh niên cơ quan Trung ương Đoàn có trách nhiệm chăm lo, tập hợp các đoàn viên trong cơ quan và đơn vị trực thuộc cơ quan; đồng thời tạo môi trường sinh hoạt, rèn luyện cho đoàn viên cơ quan. Ngoài các chương trình thực hiện theo chỉ đạo của cơ quan, Đoàn Thanh niên cơ quan Trung ương Đoàn còn chủ động tổ chức các chương trình thiện nguyện, các hoạt động an sinh xã hội để giúp đỡ, hỗ trợ bà con nhân dân và các em học sinh có hoàn cảnh khó khăn.', 'bantochuctnvtd@gmail.com', '0966722097', b'1', b'0', '/uploads/organizers/ef256473-b49d-4e79-b2ed-cd28910b09c4.jpg', 'Đoàn Thanh niên cơ quan Trung ương Đoàn', 'doanthanhniencoquantwd'),
+(4, 'Quỹ Từ thiện Bông Sen được thành lập theo Quyết định số: 24/QĐ-BNV ngày 5 tháng 1 năm 2018. Quỹ Bông Sen là phiên bản mở rộng của Quỹ Từ thiện Tình Thương thành phố Hồ Chí Minh. Quỹ có phạm vi hoạt động toàn quốc.', 'contact@quybongsen.org', '02839107612', b'1', b'0', '/uploads/organizers/d8f88460-6731-4cab-a6e8-7e89983919bd.jpg', 'Quỹ Từ thiện Bông Sen', 'quybongsen'),
+(5, 'Quỹ Hỗ trợ đổi mới giáo dục Việt Nam là Quỹ xã hội, phi lợi nhuận hàng đầu trong việc thực hiện các chương trình đổi mới giáo dục. Quỹ được thành lập theo Quyết định số 2455/QĐ-BNV của Bộ Nội Vụ ngày 23/08/2017', 'nfo@vigef.org', '0941959922', b'1', b'0', '/uploads/organizers/cadfad58-fac1-4fbd-ae77-b6b3d7ddb514.jpeg', 'Quỹ Hỗ trợ đổi mới giáo dục Việt Nam', 'quyhotrodoimoigiaoduc'),
+(6, 'Hiến máu sống khẩn cấp - Hỗ trợ những hoàn cảnh khó khăn - Hỗ trợ trẻ em nghèo đến trường - Hỗ trợ sữa mẹ miễn phí cho các bé sinh non Rất mong nhận được sự quan tâm từ các nhà hảo tâm gần xa', 'thiennguyenclbhienmau@gmail.com', '0849905925', b'1', b'0', '/uploads/organizers/9d50d41c-c418-4a3f-99ab-5fc182b3e253.jpg', 'GÓP GẠO NUÔI BÉ', 'thiennguyenclbhienmau'),
+(7, 'Vì tương lại', 'twhoinctvietnam@gmail.com', '1900151513', b'1', b'0', '/uploads/organizers/1291213f-b09d-43b9-a5d9-76749cf9d179.jpg', 'Hội Người cao tuổi Việt Nam', 'twhoinctvietnam');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int NOT NULL,
+  `avatarurl` varchar(255) DEFAULT NULL,
+  `cover_photourl` varchar(255) DEFAULT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `gender` enum('FEMALE','MALE') DEFAULT NULL,
+  `is_active` bit(1) DEFAULT NULL,
+  `is_deleted` bit(1) DEFAULT NULL,
+  `is_verified` bit(1) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `phone_number` varchar(255) DEFAULT NULL,
+  `role` enum('ADMIN','USER') DEFAULT NULL,
+  `token_expiry` datetime(6) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `verification_token` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `avatarurl`, `cover_photourl`, `created_at`, `email`, `full_name`, `gender`, `is_active`, `is_deleted`, `is_verified`, `password`, `phone_number`, `role`, `token_expiry`, `updated_at`, `verification_token`) VALUES
+(1, NULL, NULL, '2025-10-08 12:32:21.182779', 'admin@gmail.com', 'Huỳnh Ngọc Tuấn', 'MALE', b'1', b'0', b'1', '$2a$10$BMAtcTBQE9rMid9zFAssx.19h.fhYplPpQ2e/6n7qIy4Mlfqu8if2', NULL, 'ADMIN', NULL, '2025-10-08 12:32:44.180071', NULL),
+(5, '/uploads/users/avatar/7e6cd1d1-2cc3-443d-a2c4-ede2a5121f70.jpg', '/uploads/users/cover/548a3311-55bb-4e1f-b595-33e3f18edc61.jpg', '2025-10-24 22:25:17.570128', 'huynhngoctuan48@gmail.com', 'Tuan Huynh', NULL, b'1', b'0', b'1', NULL, NULL, 'USER', NULL, '2025-10-27 10:33:24.568531', NULL),
+(7, NULL, NULL, '2025-10-25 09:50:31.203837', 'huynhken2468@gmail.com', 'Nguyễn Văn An ', NULL, b'1', b'0', b'1', '$2a$10$i6u2GMNkYLu7vhHkpVrCguB7/JZXZtohWAW3ck0vFFpRsau34CLXy', NULL, 'USER', NULL, '2025-10-25 10:43:52.789457', NULL),
+(8, 'https://lh3.googleusercontent.com/a/ACg8ocKex-v5qpWEok6djRtCBAtr3BPg4htHpQ1FjmXBxgNMWxrcnw=s96-c', NULL, '2025-10-27 10:58:04.575183', 'huynhsmash2468@gmail.com', 'tuan huynh', NULL, b'1', b'0', b'1', NULL, NULL, 'USER', NULL, '2025-10-27 10:58:04.575183', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_providers`
+--
+
+CREATE TABLE `user_providers` (
+  `id` bigint NOT NULL,
+  `provider_id` varchar(255) DEFAULT NULL,
+  `provider_name` enum('FACEBOOK','GOOGLE','LOCAL') NOT NULL,
+  `user_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `user_providers`
+--
+
+INSERT INTO `user_providers` (`id`, `provider_id`, `provider_name`, `user_id`) VALUES
+(1, NULL, 'LOCAL', 1),
+(5, '2555262118187123', 'FACEBOOK', 5),
+(6, '107368677176956898168', 'GOOGLE', 5),
+(8, NULL, 'LOCAL', 7),
+(9, '117837419801609929463', 'GOOGLE', 7),
+(10, '105534495218925945207', 'GOOGLE', 8);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `campaigns`
+--
+ALTER TABLE `campaigns`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKaqf3w59x5i7ckbfwpf8i8hosu` (`category_id`),
+  ADD KEY `FKpa9jxmw7pgmpjsxwq07hg3ojv` (`organizer_id`);
+
+--
+-- Indexes for table `campaign_images`
+--
+ALTER TABLE `campaign_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKo00u8uohcpshhasoc52yfw6qr` (`campaign_id`);
+
+--
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `chat`
+--
+ALTER TABLE `chat`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK1x766u663l7m0mxuj0o72muu` (`user_id`);
+
+--
+-- Indexes for table `dashboard_statistics`
+--
+ALTER TABLE `dashboard_statistics`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `donations`
+--
+ALTER TABLE `donations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UKb2keeq2ew726sar6quiphfeqa` (`vnp_txn_ref`),
+  ADD KEY `FKr5m6trggwgkgoanlalgea1psh` (`campaign_id`),
+  ADD KEY `FKp8lwp38vg4a0v2y69d2krn562` (`donor_id`);
+
+--
+-- Indexes for table `expense_reports`
+--
+ALTER TABLE `expense_reports`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKnlyshkbl2igpqls05i8nxn1uy` (`campaign_id`),
+  ADD KEY `FKsdo78uifew4rxbkfe0s56u00k` (`created_by`);
+
+--
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKdumcu11xf8ldun8i4xpd04j43` (`chat_id`),
+  ADD KEY `FKpsmh6clh3csorw43eaodlqvkn` (`user_id`);
+
+--
+-- Indexes for table `news`
+--
+ALTER TABLE `news`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UKowrieak0v8dvhynft9mxexw15` (`slug`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FK9y21adhxn0ayjhfocscqox7bh` (`user_id`);
+
+--
+-- Indexes for table `organizers`
+--
+ALTER TABLE `organizers`
+  ADD PRIMARY KEY (`organizer_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UK6dotkott2kjsp8vw4d0m25fb7` (`email`),
+  ADD UNIQUE KEY `UK9q63snka3mdh91as4io72espi` (`phone_number`);
+
+--
+-- Indexes for table `user_providers`
+--
+ALTER TABLE `user_providers`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKjn43qct6quty65mmawu66aesk` (`user_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `campaigns`
+--
+ALTER TABLE `campaigns`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `campaign_images`
+--
+ALTER TABLE `campaign_images`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `chat`
+--
+ALTER TABLE `chat`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `dashboard_statistics`
+--
+ALTER TABLE `dashboard_statistics`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `donations`
+--
+ALTER TABLE `donations`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `expense_reports`
+--
+ALTER TABLE `expense_reports`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+
+--
+-- AUTO_INCREMENT for table `news`
+--
+ALTER TABLE `news`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `organizers`
+--
+ALTER TABLE `organizers`
+  MODIFY `organizer_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `user_providers`
+--
+ALTER TABLE `user_providers`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `campaigns`
+--
+ALTER TABLE `campaigns`
+  ADD CONSTRAINT `FKaqf3w59x5i7ckbfwpf8i8hosu` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
+  ADD CONSTRAINT `FKpa9jxmw7pgmpjsxwq07hg3ojv` FOREIGN KEY (`organizer_id`) REFERENCES `organizers` (`organizer_id`);
+
+--
+-- Constraints for table `campaign_images`
+--
+ALTER TABLE `campaign_images`
+  ADD CONSTRAINT `FKo00u8uohcpshhasoc52yfw6qr` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`);
+
+--
+-- Constraints for table `chat`
+--
+ALTER TABLE `chat`
+  ADD CONSTRAINT `FK1x766u663l7m0mxuj0o72muu` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `donations`
+--
+ALTER TABLE `donations`
+  ADD CONSTRAINT `FKp8lwp38vg4a0v2y69d2krn562` FOREIGN KEY (`donor_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `FKr5m6trggwgkgoanlalgea1psh` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`);
+
+--
+-- Constraints for table `expense_reports`
+--
+ALTER TABLE `expense_reports`
+  ADD CONSTRAINT `FKnlyshkbl2igpqls05i8nxn1uy` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`),
+  ADD CONSTRAINT `FKsdo78uifew4rxbkfe0s56u00k` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `messages`
+--
+ALTER TABLE `messages`
+  ADD CONSTRAINT `FKdumcu11xf8ldun8i4xpd04j43` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`),
+  ADD CONSTRAINT `FKpsmh6clh3csorw43eaodlqvkn` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `FK9y21adhxn0ayjhfocscqox7bh` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `user_providers`
+--
+ALTER TABLE `user_providers`
+  ADD CONSTRAINT `FKjn43qct6quty65mmawu66aesk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
