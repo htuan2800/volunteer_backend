@@ -1,0 +1,28 @@
+1. Mục đích thu thập thông tin cá nhân:
+Việc thu thập dữ liệu trên App Thiện Nguyện bao gồm: email, điện thoại, tên đăng nhập, mật khẩu đăng nhập, ngày sinh, số chứng minh thư/căn cước công dân/hộ chiếu, địa chỉ (nếu có). Đây là các thông tin cần thiết để App Thiện Nguyện cung cấp dịch vụ và hỗ trợ sản phẩm cho người sử dụng đồng thời đảm bảo quyền lợi cho các bên liên quan, chi tiết như sau:
+Hỗ trợ người dùng khi sử dụng các tính năng của App Thiện Nguyện.
+Giải đáp thắc mắc người dùng.
+Cung cấp cho người dùng thông tin mới nhất về hệ thống cũng như chức năng mới của App Thiện Nguyện.
+Thực hiện các bản khảo sát người dùng.
+Người dùng sẽ tự chịu trách nhiệm về bảo mật và lưu giữ mọi hoạt động sử dụng dịch vụ dưới tên đăng ký, số điện thoại đăng ký, mật khẩu và hộp thư điện tử của mình. Ngoài ra, người sử dụng có trách nhiệm thông báo kịp thời cho Ban quản trị App Thiện Nguyện về những hành vi sử dụng trái phép, lạm dụng, vi phạm bảo mật, lưu giữ tên đăng ký và mật khẩu của bên thứ ba để có biện pháp giải quyết phù hợp. Quy trình thông báo và giải quyết khiếu nại sẽ thực hiện theo các bước như sau:
+Bước 1: Người dùng gửi thông tin phản hồi về việc thông tin cá nhân bị thu thập trái với mục đích đã nêu.
+Bước 2: Bộ phận Giải quyết khiếu nại của App Thiện Nguyện nhận và giải quyết với các bên có liên quan.
+Bước 3: Trong trường hợp vượt ra khỏi tầm kiểm soát của App Thiện Nguyện, chúng tôi sẽ gửi đến các cơ quan có thẩm quyền để được giải quyết.
+
+2. Chia sẻ thông tin cá nhân:
+Ngoại trừ các trường hợp về sử dụng thông tin cá nhân như đã nêu trong chính sách này, App Thiện Nguyện cam kết sẽ chỉ tiết lộ thông tin của người sử dụng trong các trường hợp sau:
+Khi có yêu cầu của các cơ quan nhà nước có thẩm quyền theo quy định của pháp luật.
+Trong trường hợp mà chúng tôi tin rằng điều đó sẽ giúp chúng tôi bảo vệ quyền lợi chính đáng của mình trước pháp luật.
+Tình huống khẩn cấp và cần thiết để bảo vệ quyền an toàn cá nhân của các thành viên khác trên App Thiện Nguyện.
+Được sự đồng ý của người sử dụng.
+
+3. Thời gian lưu trữ thông tin cá nhân:
+Thông tin cá nhân của người dùng sẽ được lưu trữ không thời hạn, thông tin này sẽ được gỡ bỏ khỏi hệ thống lưu trữ khi có yêu cầu của người dùng hoặc yêu cầu của các cơ quan nhà nước có thẩm quyền theo quy định của pháp luật.
+
+4. Thay đổi thông tin cá nhân:
+Bất cứ thời điểm nào, người dùng cũng có quyền tự kiểm tra, cập nhật, điều chỉnh hoặc hủy bỏ/yêu cầu App Thiện Nguyện thực hiện đối với thông tin cá nhân.
+Trong trường hợp người dùng muốn xóa dữ liệu thông tin cá nhân, vui lòng gửi thông tin yêu cầu cho App Thiện Nguyện về địa chỉ “contact@thiennguyen.app“
+
+5. Thay đổi chính sách:
+App Thiện Nguyện có quyền thay đổi nội dung trong trang này để phù hợp với các nhu cầu của App Thiện Nguyện hoặc nhu cầu sử dụng theo phản hồi từ người dùng (nếu có).
+Trong trường hợp chỉnh sửa hoặc thay đổi nội dung, App Thiện Nguyện sẽ cập nhật nội dung chỉnh sửa hoặc thay đổi trước 07 ngày. Sau 07 ngày, nếu không có bất kỳ phản hồi nào, người dùng sẽ bị ràng buộc bởi các thỏa thuận mà chúng tôi điều chỉnh. Khi cập nhật nội dung chính sách này, chúng tôi sẽ chỉnh sửa lại thời gian “Cập nhật lần cuối” trên nền tảng App Thiện Nguyện.

@@ -23,9 +23,6 @@ public class CampaignImageServiceImp implements CampaignImageService {
     @Autowired
     private CampaignRepository campaignRepository;
 
-    @Autowired
-    private FileStorageService fileStorageService;
-
     @Override
     public List<CampaignImage> getCampaignImages(Long campaignId) {
         return campaignImageRepository.findByCampaignId(campaignId);

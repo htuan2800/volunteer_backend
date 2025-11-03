@@ -98,6 +98,9 @@ public class User {
 
     // Relationships
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Chat> chats;
+
     @OneToMany(mappedBy = "donor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Donation> donations;
 

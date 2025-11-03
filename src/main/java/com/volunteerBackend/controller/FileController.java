@@ -71,7 +71,7 @@ public class FileController {
                     .toUriString();
             
             Map<String, String> fileInfo = new HashMap<>();
-            fileInfo.put("url", fileDownloadUri);
+            fileInfo.put("url", filePath);
             fileInfos.add(fileInfo);
         }
 

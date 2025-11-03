@@ -3,6 +3,7 @@ package com.volunteerBackend.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class DashboardStatisticsController {
 
     private final DashboardStatisticsService dashboardStatisticsService;
@@ -24,7 +26,7 @@ public class DashboardStatisticsController {
         return new ResponseEntity<>(datas, HttpStatus.OK);
     }
 
-    @GetMapping("/api/statistics")
+    @GetMapping("/admin/statistics")
     public ResponseEntity<DashboardStatisticsDTO> getStatistics(
             @RequestParam(defaultValue = "7") int days) {
         

@@ -66,7 +66,6 @@ public class UserServiceImp implements UserService {
     @Autowired
     private NotificationService notificationService;
 
-
     @Override
     public boolean createUser(User user) throws UserException {
         if (userRepository.existsByEmail(user.getEmail())) {
@@ -135,7 +134,7 @@ public class UserServiceImp implements UserService {
         newUser.setEmail(user.getEmail());
         newUser.setRole(UserRole.USER);
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        
+
         newUser.setVerificationToken(token);
         newUser.setTokenExpiry(LocalDateTime.now().plus(tokenExpiryMs, ChronoUnit.MILLIS));
 
@@ -149,14 +148,12 @@ public class UserServiceImp implements UserService {
         payload.setEmail(user.getEmail());
         payload.setFullname(user.getFullName());
         rabbitTemplate.convertAndSend(
-            RabbitMQConfig.EXCHANGE_USER_NAME,
-            RabbitMQConfig.ROUTING_REGISTRATION_KEY,
-            payload);
+                RabbitMQConfig.EXCHANGE_USER_NAME,
+                RabbitMQConfig.ROUTING_REGISTRATION_KEY,
+                payload);
         dashboardStatisticsService.updateTotalUsers();
         return savedUser;
     }
-
-
 
     @Override
     public boolean forgotPassword(String email) throws UserException {
@@ -173,9 +170,9 @@ public class UserServiceImp implements UserService {
         payload.setEmail(user.getEmail());
         payload.setFullname(user.getFullName());
         rabbitTemplate.convertAndSend(
-                        RabbitMQConfig.EXCHANGE_USER_NAME,
-                        RabbitMQConfig.ROUTING_FORGETPASSWORD_KEY,
-                        payload);
+                RabbitMQConfig.EXCHANGE_USER_NAME,
+                RabbitMQConfig.ROUTING_FORGETPASSWORD_KEY,
+                payload);
         return true;
     }
 
@@ -210,6 +207,16 @@ public class UserServiceImp implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setVerificationToken(null);
         user.setTokenExpiry(null);
+        boolean isAlreadyLinked = user.getProviders().stream()
+                .anyMatch(p -> p.getProviderName().equals(AuthProvider.GOOGLE) ||
+                        p.getProviderName().equals(AuthProvider.FACEBOOK));
+        if(isAlreadyLinked)
+        {
+            UserProvider userProvider = new UserProvider();
+            userProvider.setProviderName(AuthProvider.LOCAL);
+            userProvider.setUser(user);
+            user.getProviders().add(userProvider);
+        }
         userRepository.save(user);
         return true;
     }
@@ -220,32 +227,29 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public boolean updateUser(UserRequest user, Integer userId) throws UserException {
-        Optional<User> user1 = userRepository.findById(userId);
-        if (user1.isEmpty()) {
+    public boolean updateUser(UserRequest user, User existingUser) throws UserException {
+        if (existingUser == null) {
             throw new UserException("User not found");
         }
-        User oldUser = user1.get();
-        if(user.getOption().equals("COVER_IMAGE"))
-        {
-            if(oldUser.getCoverPhotoURL() != null)
-            {
-                fileStorageService.deleteFile(oldUser.getCoverPhotoURL());
+        if (user.getOption().equals("COVER_IMAGE")) {
+            if (existingUser.getCoverPhotoURL() != null) {
+                fileStorageService.deleteFile(existingUser.getCoverPhotoURL());
             }
-            oldUser.setCoverPhotoURL(user.getCoverPhotoURL());
-        } else if(user.getOption().equals("AVATAR_IMAGE")) {
-            if(oldUser.getAvatar() != null)
-            {
-                fileStorageService.deleteFile(oldUser.getAvatar());
+            existingUser.setCoverPhotoURL(user.getCoverPhotoURL());
+        } else if (user.getOption().equals("AVATAR_IMAGE")) {
+            if (existingUser.getAvatar() != null) {
+                if (existingUser.getAvatar().startsWith("http") || existingUser.getAvatar().startsWith("https")) {
+                } else {
+                    fileStorageService.deleteFile(existingUser.getAvatar());
+                }
             }
-            oldUser.setAvatar(user.getAvatar());
+            existingUser.setAvatar(user.getAvatar());
+        } else {
+            existingUser.setFullName(user.getFullName());
+            existingUser.setGender(user.getGender());
+            existingUser.setPhoneNumber(user.getPhoneNumber());
         }
-        else {
-            oldUser.setFullName(user.getFullName());
-            oldUser.setGender(user.getGender());
-            oldUser.setPhoneNumber(user.getPhoneNumber());
-        }
-        userRepository.save(oldUser);
+        userRepository.save(existingUser);
         return true;
     }
 
@@ -258,20 +262,15 @@ public class UserServiceImp implements UserService {
         User oldUser = user1.get();
         oldUser.setFullName(user.getFullName());
         oldUser.setGender(user.getGender());
-        if(user.getOption().equals("IMAGE"))
-        {
-            if(StringUtils.hasText(user.getAvatar()))
-            {
-                if(StringUtils.hasText(oldUser.getAvatar()))
-                {
+        if (user.getOption().equals("IMAGE")) {
+            if (StringUtils.hasText(user.getAvatar())) {
+                if (StringUtils.hasText(oldUser.getAvatar())) {
                     fileStorageService.deleteFile(oldUser.getAvatar());
                 }
                 oldUser.setAvatar(user.getAvatar());
             }
-            if(StringUtils.hasText(user.getCoverPhotoURL()))
-            {
-                if(StringUtils.hasText(oldUser.getCoverPhotoURL()))
-                {
+            if (StringUtils.hasText(user.getCoverPhotoURL())) {
+                if (StringUtils.hasText(oldUser.getCoverPhotoURL())) {
                     fileStorageService.deleteFile(oldUser.getCoverPhotoURL());
                 }
                 oldUser.setCoverPhotoURL(user.getCoverPhotoURL());
@@ -280,18 +279,19 @@ public class UserServiceImp implements UserService {
         userRepository.save(oldUser);
         System.out.println("DONE");
         NotificationRequest notificationRequest = new NotificationRequest();
-                notificationRequest.setUserId(oldUser.getId());
-                notificationRequest.setTitle("Thay đổi thông tin cá nhân");
-                notificationRequest.setMessage("Thông tin cá nhân của bạn đã được thay đổi vui lòng kiếm tra lại");
-                notificationRequest.setRelatedId(null);
-                notificationRequest.setType(NotificationType.SYSTEM);
+        notificationRequest.setUserId(oldUser.getId());
+        notificationRequest.setTitle("Thay đổi thông tin cá nhân");
+        notificationRequest.setMessage("Thông tin cá nhân của bạn đã được thay đổi vui lòng kiếm tra lại");
+        notificationRequest.setRelatedId(null);
+        notificationRequest.setType(NotificationType.SYSTEM);
         notificationService.createNotification(notificationRequest);
         return true;
     }
 
     @Override
     public User findUserByJwt(String Jwt) {
-        if(Jwt == null) return null;
+        if (Jwt == null)
+            return null;
         Integer id = JwtProvider.getIdFromJwtToken(Jwt);
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
@@ -351,9 +351,9 @@ public class UserServiceImp implements UserService {
         payload.setEmail(user.getEmail());
         payload.setFullname(user.getFullName());
         rabbitTemplate.convertAndSend(
-            RabbitMQConfig.EXCHANGE_USER_NAME,
-            RabbitMQConfig.ROUTING_REGISTRATION_KEY,
-            payload);
+                RabbitMQConfig.EXCHANGE_USER_NAME,
+                RabbitMQConfig.ROUTING_REGISTRATION_KEY,
+                payload);
     }
 
     @Override

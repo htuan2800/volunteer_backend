@@ -1,0 +1,41 @@
+GIẢI THÍCH KHÁI NIỆM
+1. “Ứng dụng Thiện nguyện” (Gọi tắt là ứng dụng) là giải pháp công nghệ cung cấp các tiện ích và công cụ cho các cá nhân, câu lạc bộ, hội, đội, nhóm đang hoạt động liên quan đến lĩnh vực tình nguyện, nhân đạo, từ thiện, hoạt động xã hội, tình nguyện vì mục tiêu phát triển bền vững tổ chức các chiến dịch cộng đồng theo tiêu chí công khai, minh bạch, hiệu quả. Ứng dụng ra đời với mục tiêu xây dựng một cộng đồng những cá nhân theo đuổi sứ mệnh thiện nguyện minh bạch, bền vững, lan toả những giá trị tốt đẹp trong cộng đồng.
+2. “Người dùng” ứng dụng là các cá nhân và tổ chức tham gia vào hoạt động thiện nguyện cộng đồng trên nền tảng dưới các vai trò khác nhau như người vận động, người ủng hộ, người tạo nội dung. Các tổ chức, câu lạc bộ, đội, nhóm tình nguyện có tư cách pháp nhân trực thuộc các tổ chức tại địa phương hoặc tư lập chưa hoặc không có tư cách pháp nhân.
+3. “Người vận động” là các cá nhân bao gồm nhưng không giới hạn các ngành nghề như nhà báo, nghệ sĩ, ca sĩ, diễn viên, vận động viên thể thao nhà hoạt động xã hội có ảnh hưởng tốt trong xã hội, cộng đồng, có mong muốn và khả năng tổ chức các chiến dịch gây quỹ cộng đồng, đề cao giá trị minh bạch trong hoạt động thiện nguyện. Cá nhân có đủ năng lực hành vi dân sự theo quy định tại Nghị định 93/2021/NĐ-CP và các quy định có liên quan.
+4. “Người ủng hộ” là tất cả các cá nhân, tổ chức có mong muốn tham gia cộng đồng thiện nguyện minh bạch thông qua tải ứng dụng và đăng ký thành viên.
+5. “MBBank” là Ngân hàng Thương mại cổ phần Quân đội là đơn vị được Chính phủ giao chủ trì xây dựng nền tảng nhân đạo số quốc gia iNhandao (gọi tắt là iNhandao) theo Quyết định số 3068/QĐ-BKHCN ngày 23/10/2019 “về việc giao nhiệm vụ triển khai nền tảng nhân đạo số”.
+6.“Tài khoản thiện nguyện”: Là tài khoản thanh toán VND do MBBank phát hành dành riêng cho mục đích thiện nguyện, được sử dụng như các tài khoản thanh toán cá nhân với tính năng đặc biệt tự động công khai, minh bạch số dư tài khoản, toàn bộ giao dịch thu theo thời gian thực trên ứng dụng Thiện Nguyện.
+7.“Tài khoản xác thực”: Là tài khoản thiện nguyện được liên kết với tài khoản của Người vận động trên ứng dụng Thiện nguyện nhằm hiển thị thông tin tài khoản thiện nguyện được liên kết đồng thời cập nhật các hoạt động liên quan đến việc phát động chiến dịch, vận động, tiếp nhận và phân phối.
+8.“Tài khoản người dùng”: Là tài khoản được mở cho tất cả cá nhân và tổ chức trên ứng dụng Thiện nguyện nhằm tổ chức và tham gia các hoạt động thiện nguyện.
+9.“VietQR”: Là nhận diện thương hiệu dành cho các dịch vụ thanh toán, chuyển khoản bằng mã QR được xử lý qua mạng lưới Napas, các Ngân hàng thành viên, Trung gian thanh toán, các đối tác thanh toán tại Việt Nam và Quốc tế của Napas.
+
+NGUYÊN TẮC HOẠT ĐỘNG
+1. Ứng dụng Thiện nguyện là giải pháp nhằm ứng dụng công nghệ vào giải quyết các bài toán về kết nối và lan tỏa hoạt động nhân đạo, từ thiện, phát triển cộng đồng, mục tiêu trở thành một mạng xã hội chuyên sâu về thiện nguyện tại Việt Nam.
+2. Ứng dụng Thiện nguyện là nền tảng nhân đạo thiện nguyện phi lợi nhuận và không thu chi phí quản lý hay bất kỳ chi phí gì của người dùng. 100% số tiền ủng hộ cho các chiến dịch nhận được sẽ được sử dụng đúng với mục đích kêu gọi.
+3. Ứng dụng Thiện nguyện hoạt động trên tôn chỉ thúc đẩy tính minh bạch của hoạt động từ thiện tại Việt Nam, thông qua cơ chế giám sát công khai từ cộng đồng.
+
+CÁC HÀNH VI BỊ CẤM
+1. Cản trở hoặc ép buộc tổ chức, cá nhân tham gia hoạt động thiện nguyện.
+2. Báo cáo sai sự thật, gian lận, chiếm đoạt, sử dụng trái phép tiền, hàng do các tổ chức, cá nhân trong nước, ngoài nước ủng hộ, đóng góp.
+3. Lợi dụng hoạt động thiện nguyện để vụ lợi.
+
+QUY ĐỊNH KHÁC
+1. Quy định về đặt tên tài khoản
+Không được đặt tên tài khoản, nhân vật theo tên của danh nhân, tên của các vị lãnh đạo, tên của trùm khủng bố, phát xít, tội phạm, và tên của những cá nhân, tổ chức chống lại Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam, mà gây phương hại đến an ninh quốc gia, trật tự an toàn xã hội và nguyên tắc hoạt động của nền tảng.
+Không được đặt tên tài khoản, nhân vật trùng hoặc tương tự gây nhầm lẫn với tên viết tắt, tên đầy đủ của cơ quan nhà nước, tổ chức chính trị, tổ chức chính trị - xã hội, tổ chức chính trị xã hội - nghề nghiệp, tổ chức xã hội, tổ chức xã hội - nghề nghiệp của Việt Nam và tổ chức quốc tế, nếu không được cơ quan, tổ chức đó cho phép.
+Không được đặt tên tài khoản, nhân vật trùng hoặc gây nhầm lẫn để giả mạo các cá nhân, tổ chức khác nhằm mục đích đưa thông tin sai sự thật, xuyên tạc, vu khống, xúc phạm uy tín của tổ chức, danh dự và nhân phẩm của cá nhân khác.
+Không được đặt tên tài khoản, nhân vật vi phạm các quyền sở hữu trí tuệ.
+Tài khoản vi phạm quy định về đặt tên sẽ bị khoá và/hoặc xóa vĩnh viễn mà không cần thông báo.
+2. Quy định về hình ảnh
+Không sử dụng hình ảnh có hàm ý kích động bạo lực, dâm ô, đồi trụy, tội ác, tệ nạn xã hội, mê tín dị đoan, phá hoại thuần phong, mỹ tục của dân tộc.
+Không sử dụng hình ảnh hoặc hình ảnh mô tả có tính xúc phạm các danh nhân, anh hùng dân tộc, lãnh đạo Đảng và Nhà nước của Việt Nam và lãnh đạo của các cơ quan tổ chức quốc tế.
+Không sử dụng hình ảnh có chứa dấu hiệu trùng hoặc tương tự đến mức gây nhầm lẫn với biểu tượng, cờ, huy hiệu, tên viết tắt, tên đầy đủ của cơ quan nhà nước, tổ chức chính trị, tổ chức chính trị - xã hội, tổ chức chính trị xã hội - nghề nghiệp, tổ chức xã hội, tổ chức xã hội - nghề nghiệp của Việt Nam và tổ chức quốc tế mà xúc phạm đến uy tín của các tổ chức này.
+Không sử dụng các hình ảnh liên quan tới tôn giáo mà gây kích động, chia rẽ khối đại đoàn kết dân tộc, đi ngược lại chính sách tôn giáo của Việt Nam.
+Không sử dụng ảnh của tội phạm, khủng bố, phát xít, và ảnh hoặc hình ảnh mô tả các cá nhân, tổ chức chống lại Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam, gây phương hại đến an ninh quốc gia, trật tự an toàn xã hội.
+Không sử dụng ảnh xúc phạm uy tín của tổ chức, danh dự và nhân phẩm của cá nhân khác.
+Không sử dụng hình ảnh vi phạm các quyền sở hữu trí tuệ.
+Tài khoản vi phạm quy định về hình đại diện sẽ bị khoá và/hoặc xóa vĩnh viễn mà không cần thông báo.
+
+BẢN QUYỀN
+1. Tất cả nội dung, hình ảnh, thiết kế, tập tin và thông tin trong Ứng Dụng đều thuộc bản quyền của MBBank và không được sao chép, sửa đổi hoặc sử dụng dưới bất kỳ hình thức nào nếu không có sự cho phép bằng văn bản của MBBank. Ứng Dụng có thể bao gồm các thương hiệu, chi nhánh hoặc dịch vụ của MBBank hoặc các bên thứ ba khác của MBBank, dưới dạng từ ngữ, đồ họa và/hoặc logo.
+2. Nhãn hiệu hoặc nhãn hiệu Ứng Dụng của MBBank được bảo vệ bởi luật pháp hiện hành và việc sử dụng Ứng Dụng không cấu thành bất kỳ quyền sở hữu hoặc bất kỳ quyền hoặc giấy phép sử dụng nào mà không có sự cho phép trước bằng văn bản của MBBank.

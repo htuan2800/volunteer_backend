@@ -10,6 +10,6 @@ public interface ChatService {
     Boolean findChatById(Integer chatId, User currentUser) throws Exception;
     ChatDTO getChatWithAI(User reqUser);
     List<ChatDTO> getChatWithUser(User reqUser);
-    ChatDTO getChatWithUserContact(User reqUser);
-    
+    ChatDTO getChatWithUserContactWithAdmin(User reqUser);
+    ChatDTO getChatWithUserContactWithAI(User reqUser);
 }

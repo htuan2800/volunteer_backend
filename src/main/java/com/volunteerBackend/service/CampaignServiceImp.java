@@ -89,6 +89,11 @@ public class CampaignServiceImp implements CampaignService {
     }
 
     @Override
+    public List<Campaign> getCampaignByOrganizerAndStatus(Organizer organizer, CampaignStatus status) {
+        return campaignRepository.findByOrganizerAndStatus(organizer, status);
+    }
+
+    @Override
     public List<Campaign> getFilteredCampaigns(Long categoryID, String status, String keyword) {
         CampaignStatus campaignStatus = null;
         if (status != null && !"null".equals(status)) {

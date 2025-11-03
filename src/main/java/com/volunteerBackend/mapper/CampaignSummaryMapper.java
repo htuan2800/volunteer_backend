@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.stereotype.Component;
 
@@ -38,8 +39,11 @@ public class CampaignSummaryMapper {
         dto.setSupportCount(campaign.getDonations().size());
         dto.setOrganizer(organizerMapper.toDTO(campaign.getOrganizer()));
         dto.setStatus(campaign.getStatus());
-        Period period = Period.between(LocalDate.now(), campaign.getEndDate());
-        dto.setDayLeft(period.getDays());
+        // Period period = Period.between(LocalDate.now(), campaign.getEndDate());
+        LocalDate startDate = LocalDate.now(); 
+        LocalDate endDate = campaign.getEndDate();
+        long totalDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+        dto.setDayLeft(totalDaysBetween);
         dto.setPercentage(calculatePercentage(campaign));
         return dto;
     }
@@ -82,8 +86,10 @@ public class CampaignSummaryMapper {
         dto.setFeaturedImage(fileStorageProperties.getBaseUrl() + campaign.getFeaturedImage());
         dto.setSupportCount(campaign.getDonations().size());
         dto.setPercentage(calculatePercentage(campaign));
-        Period period = Period.between(LocalDate.now(), campaign.getEndDate());
-        dto.setDayLeft(period.getDays());
+        LocalDate startDate = LocalDate.now(); 
+        LocalDate endDate = campaign.getEndDate();
+        long totalDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+        dto.setDayLeft(totalDaysBetween);
         return dto;
     }
 

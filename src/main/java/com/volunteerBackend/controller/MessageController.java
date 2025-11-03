@@ -5,15 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-// import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.volunteerBackend.DTO.MessageDTO;
 import com.volunteerBackend.model.User;
 import com.volunteerBackend.request.MessageRequest;
@@ -47,19 +43,8 @@ public class MessageController {
         String sessionId = req.getSessionId();
 
         try {
-            User user = null;
-            try {
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-                    user = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
-                            .setParameter("username", auth.getName())
-                            .getSingleResult();
-                }
-            } catch (Exception e) {
-                System.err.println("Không lấy được thông tin người dùng: " + e.getMessage());
-            }
 
-           messageService.processUserMessage(req, user);
+           messageService.processUserMessage(req);
 
         } catch (Exception e) {
             System.err.println("Lỗi trong createMessage: " + e.getMessage());
@@ -67,7 +52,6 @@ public class MessageController {
             messagingTemplate.convertAndSend("/topic/chat/" + sessionId, "Đã xảy ra lỗi: " + e.getMessage());
         }
     }
-
 
     @GetMapping("/api/messages/chat/{chatBoxId}")
     public List<MessageDTO> findChatMessage(@RequestHeader("Authorization") String jwt, @PathVariable Integer chatBoxId)

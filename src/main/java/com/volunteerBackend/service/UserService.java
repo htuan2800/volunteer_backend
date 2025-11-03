@@ -29,7 +29,7 @@ public interface UserService {
 
     public User findByFullName(String username);
 
-    public boolean updateUser(UserRequest user, Integer userId) throws UserException;
+    public boolean updateUser(UserRequest user, User existingUser) throws UserException;
 
     public boolean updateUserByAdmin(UserRequest user, Integer userId) throws UserException;
 

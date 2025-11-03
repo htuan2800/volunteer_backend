@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 
 @RestController
+@RequestMapping("/api")
 public class DonatationController {
     @Autowired
     private DonateService donatationService;
@@ -49,14 +51,7 @@ public class DonatationController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/api/donates")
-    public ResponseEntity<List<DonateSummaryDTO>> getAllDonates() {
-        List<Donation> donates = donatationService.getAllDonates();
-        List<DonateSummaryDTO> donatesDTO = donationSummaryMapper.toDTOListByAdmin(donates);
-        return new ResponseEntity<>(donatesDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/api/donates/donor")
+    @GetMapping("/donates/donor")
     public ResponseEntity<List<DonateSummaryDTO>> getAllDonatesByDonorName(@RequestParam(required = false) String name) {
         List<Donation> donates = donatationService.getAllDonatesByDonorName(name);
         List<DonateSummaryDTO> donatesDTO = donationSummaryMapper.toDTOListByAdmin(donates);
@@ -70,7 +65,14 @@ public class DonatationController {
         return new ResponseEntity<>(donatesDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/api/donates/{donateId}")
+    @GetMapping("/admin/donates")
+    public ResponseEntity<List<DonateSummaryDTO>> getAllDonates() {
+        List<Donation> donates = donatationService.getAllDonates();
+        List<DonateSummaryDTO> donatesDTO = donationSummaryMapper.toDTOListByAdmin(donates);
+        return new ResponseEntity<>(donatesDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/donates/{donateId}")
     public ResponseEntity<DonaterDTO> getDonate(@PathVariable Long donateId) {
         Donation donate = donatationService.getDonationById(donateId);
         DonaterDTO donateDTO = donaterMapper.toDTO(donate);

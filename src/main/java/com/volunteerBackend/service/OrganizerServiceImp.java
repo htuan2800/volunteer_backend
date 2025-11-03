@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.volunteerBackend.DTO.OrganizerStatsDTO;
 import com.volunteerBackend.exceptions.UserException;
 import com.volunteerBackend.model.Organizer;
 import com.volunteerBackend.repository.OrganizerRepository;
@@ -29,6 +30,11 @@ public class OrganizerServiceImp implements OrganizerService {
     @Override
     public Organizer findOrganizerById(Integer id) {
         return organizerRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public OrganizerStatsDTO findDashboardDataByOrganizerById(Integer id) {
+        return organizerRepository.getOrganizerStats(id, com.volunteerBackend.type.PaymentStatus.COMPLETED);
     }
 
     @Override

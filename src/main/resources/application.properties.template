@@ -9,16 +9,14 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.jdbc.time_zone=Asia/Ho_Chi_Minh
 logging.level.org.springframework.web.socket=TRACE
 logging.level.org.springframework.messaging=TRACE
-spring.data.redis.host=localhost
-spring.data.redis.port=6379
 
 app.base-url=http://localhost:5175
 app.verification.token-expiry=3600000
 
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
-spring.mail.username=TU_NHAP
-spring.mail.password=TU_NHAP
+spring.mail.username=TU_NHAP_KEY
+spring.mail.password=TU_NHAP_KEY
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 
@@ -33,21 +31,29 @@ file.upload-dir=./uploads
 file.base-url=http://localhost:8092
 
 #AI
-# spring.ai.ollama.base-url=http://localhost:11434
-# spring.ai.ollama.chat.options.model=qwen3:1.7b
-# spring.ai.ollama.chat.options.temperature=0.5
-# spring.ai.ollama.chat.options.top-p=0.9
+spring.ai.ollama.base-url=http://localhost:11434
+spring.ai.ollama.embedding.model=nomic-embed-text
 
-spring.ai.openai.api-key=TU_NHAP
+spring.ai.openai.api-key=TU_NHAP_KEY
 spring.ai.openai.base-url=https://generativelanguage.googleapis.com/v1beta/openai/
 spring.ai.openai.chat.completions-path=chat/completions
 spring.ai.openai.chat.options.model=gemini-2.0-flash
 spring.ai.openai.chat.options.temperature=0.5
 spring.ai.openai.chat.options.top-p=0.9
 
+spring.ai.model.chat=openai
+spring.ai.model.embedding=ollama
+
+#REDIS  
+spring.data.redis.host=localhost
+spring.data.redis.port=6381
+spring.ai.vectorstore.redis.initialize-schema=true
+spring.ai.vectorstore.redis.index-name=database-index
+spring.ai.vectorstore.redis.prefix=schema:
+
 #VNPAY
-vnpay.tmn-code=TU_NHAP
-vnpay.hash-secret=TU_NHAP
+vnpay.tmn-code=TU_NHAP_KEY
+vnpay.hash-secret=TU_NHAP_KEY
 vnpay.pay-url=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
 vnpay.api-url=https://sandbox.vnpayment.vn/merchant_webapi/api/donation
 vnpay.return-url=http://localhost:5175/payments/payment-callback
@@ -67,13 +73,13 @@ spring.rabbitmq.password=guest
 server.servlet.session.cookie.name=OAUTH2_SESSION
 
 # Cấu hình Google
-spring.security.oauth2.client.registration.google.client-id=TU_NHAP
-spring.security.oauth2.client.registration.google.client-secret=TU_NHAP
+spring.security.oauth2.client.registration.google.client-id=TU_NHAP_KEY
+spring.security.oauth2.client.registration.google.client-secret=TU_NHAP_KEY
 spring.security.oauth2.client.registration.google.scope=openid,profile,email
 spring.security.oauth2.client.provider.google.user-info-uri=https://www.googleapis.com/oauth2/v3/userinfo
 spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8092/login/oauth2/code/google
 
-spring.security.oauth2.client.registration.facebook.client-id=TU_NHAP
-spring.security.oauth2.client.registration.facebook.client-secret=TU_NHAP
+spring.security.oauth2.client.registration.facebook.client-id=TU_NHAP_KEY
+spring.security.oauth2.client.registration.facebook.client-secret=TU_NHAP_KEY
 spring.security.oauth2.client.registration.facebook.scope=public_profile,email
 spring.security.oauth2.client.registration.facebook.redirect-uri=http://localhost:8092/login/oauth2/code/facebook

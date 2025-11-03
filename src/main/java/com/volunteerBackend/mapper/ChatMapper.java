@@ -37,7 +37,7 @@ public class ChatMapper {
             dto.setChatName(chat.getChatName());
         } else {
             dto.setChatName(chat.getUser().getFullName());
-            if (chat.getUser().getAvatar().startsWith("http")) {
+            if (chat.getUser().getAvatar().startsWith("http") || chat.getUser().getAvatar().startsWith("https")) {
                 dto.setChatImage(chat.getUser().getAvatar());
             } else {
                 dto.setChatImage(fileStorageProperties.getBaseUrl() + chat.getUser().getAvatar());

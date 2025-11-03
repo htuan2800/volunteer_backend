@@ -12,7 +12,6 @@ import com.volunteerBackend.DTO.ChatDTO;
 import com.volunteerBackend.model.Chat;
 import com.volunteerBackend.model.User;
 import com.volunteerBackend.repository.ChatRepository;
-import com.volunteerBackend.repository.UserRepository;
 import com.volunteerBackend.type.ChatType;
 import com.volunteerBackend.type.UserRole;
 import com.volunteerBackend.mapper.ChatMapper;
@@ -24,8 +23,6 @@ public class ChatServiceImplementation implements ChatService {
     private ChatRepository chatRepository;
     @Autowired
     private ChatMapper chatMapper;
-    @Autowired
-    private UserRepository userRepository;
 
     @Override
     public Chat createChatAI(User reqUser) {
@@ -83,12 +80,34 @@ public class ChatServiceImplementation implements ChatService {
     }
 
     @Override
-    public ChatDTO getChatWithUserContact(User reqUser) {
+    public ChatDTO getChatWithUserContactWithAdmin(User reqUser) {
         User currentUser = reqUser;
-        Optional<Chat> optionalChat = chatRepository.findByUser(currentUser);
+        Optional<Chat> optionalChat = chatRepository.findByUserAndChatType(currentUser, ChatType.CUSTOMER);
         if(optionalChat.isEmpty()){
             Chat chat = new Chat();
             chat.setChatType(ChatType.CUSTOMER);
+            chat.setCreatedAt(LocalDateTime.now());
+            chat.setSessionId(UUID.randomUUID().toString());
+            chat.setUser(currentUser);
+            chatRepository.save(chat);
+            return chatMapper.toDTO(chat);
+        }
+        Chat chat = optionalChat.get();
+        // Kiem tra user co thuoc chat nay khong
+        boolean isParticipant = chat.getUser().equals(currentUser);
+        if (!isParticipant) {
+            throw new IllegalArgumentException("User não có quyen truy cap chat nay");
+        }
+        return chatMapper.toDTO(chat);
+    }
+
+    @Override
+    public ChatDTO getChatWithUserContactWithAI(User reqUser) {
+        User currentUser = reqUser;
+        Optional<Chat> optionalChat = chatRepository.findByUserAndChatType(currentUser, ChatType.AI);
+        if(optionalChat.isEmpty()){
+            Chat chat = new Chat();
+            chat.setChatType(ChatType.AI);
             chat.setCreatedAt(LocalDateTime.now());
             chat.setSessionId(UUID.randomUUID().toString());
             chat.setUser(currentUser);

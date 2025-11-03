@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.volunteerBackend.model.Campaign;
 import com.volunteerBackend.model.Category;
+import com.volunteerBackend.model.Organizer;
 import com.volunteerBackend.type.CampaignStatus;
 import com.volunteerBackend.type.PaymentStatus;
 
@@ -19,6 +20,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
     List<Campaign> findByTitleContainingIgnoreCase(String title);
     boolean existsByTitle(String title);
     Campaign findByIdAndStatus( Long id, CampaignStatus status);
+    List<Campaign> findByOrganizerAndStatus( Organizer organizer, CampaignStatus status);
     List<Campaign>findByStatusOrTitle(CampaignStatus status, String title);
     List<Campaign>findByCategoryAndStatusOrTitle(Category category, CampaignStatus status, String title);
 

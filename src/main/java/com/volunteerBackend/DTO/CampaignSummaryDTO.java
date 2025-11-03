@@ -21,7 +21,7 @@ public class CampaignSummaryDTO {
     public String storyInfo;
     public String featuredImage;
     public Integer SupportCount;
-    public Integer dayLeft;
+    public Long dayLeft;
     public CampaignStatus status;
     public OrganizerDTO organizer; 
     public List<CampaignImageDTO> campaignImages;

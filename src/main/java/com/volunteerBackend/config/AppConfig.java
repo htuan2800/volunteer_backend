@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration // Đánh dấu lớp này là một lớp cấu hình của Spring.
 @EnableWebSecurity // Kích hoạt Spring Security cho ứng dụng.
+@EnableMethodSecurity
 public class AppConfig {
     @Autowired
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
@@ -46,23 +48,21 @@ public class AppConfig {
                 management -> management.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS)) // Spring Security sẽ không tạo hoặc lưu trữ session.
                 .authorizeHttpRequests(Authorize -> Authorize
-                        .requestMatchers("/api/auth/reset-password-phone", "/api/auth/verify-token").permitAll()
-                        .requestMatchers("/api/**").authenticated() // Yêu cầu các API có đường dẫn bắt đầu bằng /api phải đăng nhập mới được truy cập.
-                        .anyRequest().permitAll()) // Cho phép tất cả các request khác (không phải /api/**) được truy cập mà không cần đăng nhập.
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // only ADMIN
+                        .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                     .userInfoEndpoint(userInfo -> userInfo
-                        .oidcUserService(customOidcUserService) // << Xử lý thông tin user sau khi đăng nhập thành công
-                        .userService(customOAuth2UserService) // << Xử lý thông tin user sau khi đăng nhập thành công
+                        .oidcUserService(customOidcUserService)
+                        .userService(customOAuth2UserService)
                     )
-                    .successHandler(oAuth2LoginSuccessHandler ) // << Xử lý sau khi đăng nhập thành công hoàn toàn
+                    .successHandler(oAuth2LoginSuccessHandler ) // << Xử lý sau khi đăng nhập thành công
                 )
                 .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
         // .httpBasic(withDefaults())
         // .formLogin(withDefaults());
-        // Tắt bảo vệ CSRF vì ứng dụng REST API thường sử dụng JWT, không cần cơ chế bảo
-        // vệ CSRF.
+        // Tắt bảo vệ CSRF vì ứng dụng REST API thường sử dụng JWT, không cần cơ chế bảo vệ CSRF.
         return http.build();
     }
 
@@ -73,8 +73,7 @@ public class AppConfig {
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration cfg = new CorsConfiguration();
                 cfg.setAllowedOrigins(Arrays.asList(
-                        "http://localhost:5175",
-                        "https://49j386n7-5175.asse.devtunnels.ms"
+                        "http://localhost:5175"
                 ));
                 cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Liệt kê cụ thể các
                                                                                                  // phương thức

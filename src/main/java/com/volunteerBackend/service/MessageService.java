@@ -11,7 +11,7 @@ import com.volunteerBackend.request.MessageRequest;
 
 public interface MessageService {
     MessageDTO createMessage(MessageRequest req) throws Exception;
-    void processUserMessage(MessageRequest req, User currentUser);
+    void processUserMessage(MessageRequest req);
     MessageDTO saveAiMessage(Chat chat, String content, MessageType messageType);
     List<MessageDTO> findChatsMessages(Integer chatId, User user) throws Exception;
 }

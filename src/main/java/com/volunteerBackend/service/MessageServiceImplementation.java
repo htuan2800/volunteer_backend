@@ -31,7 +31,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import reactor.core.publisher.Flux;
 
-
 @Service
 public class MessageServiceImplementation implements MessageService {
     private static final String SCHEMA_FILE = "src/main/resources/db_schema.txt";
@@ -46,6 +45,8 @@ public class MessageServiceImplementation implements MessageService {
     @PersistenceContext
     private final EntityManager entityManager;
 
+    private final SchemaVectorService schemaVectorService;
+
     public MessageServiceImplementation(JdbcTemplate jdbcTemplate,
             ChatClient.Builder chatClient,
             MessageRepository messageRepository,
@@ -53,7 +54,8 @@ public class MessageServiceImplementation implements MessageService {
             UserRepository userRepository,
             MessageMapper messageMapper,
             SimpMessagingTemplate messagingTemplate,
-            EntityManager entityManager) {
+            EntityManager entityManager,
+            SchemaVectorService schemaVectorService) {
         this.jdbcTemplate = jdbcTemplate;
         this.chatClient = chatClient.build();
         this.messageRepository = messageRepository;
@@ -62,6 +64,7 @@ public class MessageServiceImplementation implements MessageService {
         this.messageMapper = messageMapper;
         this.messagingTemplate = messagingTemplate;
         this.entityManager = entityManager;
+        this.schemaVectorService = schemaVectorService;
     }
 
     @Transactional
@@ -87,7 +90,7 @@ public class MessageServiceImplementation implements MessageService {
 
     @Override
     @Transactional
-    public void processUserMessage(MessageRequest req, User currentUser) {
+    public void processUserMessage(MessageRequest req) {
         String sessionId = req.getSessionId();
 
         try {
@@ -106,13 +109,14 @@ public class MessageServiceImplementation implements MessageService {
             // 2. Lưu tin nhắn của user
             MessageDTO userMessage = createMessage(req);
             messagingTemplate.convertAndSend("/topic/chat/" + sessionId, Map.of(
-                                    "type", "USER_MESSAGE",
-                                    "message", userMessage));
+                        "type", "USER_MESSAGE",
+                        "message", userMessage));
 
             // 3. Xử lý AI query và gửi response
-            if(req.getType().equals("AI"))
-            {
-                processAndRespond(req.getText(), sessionId, chat);
+            if (req.getType().equals("AI_WITH_ADMIN")) {
+                processAndRespondofAIWithADMIN(req.getText(), sessionId, chat);
+            } else if (req.getType().equals("USER_WITH_AI")) {
+                processAndRespondOfAIWithUSER(req.getText(), sessionId, chat);
             }
 
         } catch (Exception e) {
@@ -144,7 +148,7 @@ public class MessageServiceImplementation implements MessageService {
     }
 
     // Service AI
-    public void processAndRespond(String userQuery, String sessionId, Chat chat) throws IOException {
+    public void processAndRespondofAIWithADMIN(String userQuery, String sessionId, Chat chat) throws IOException {
         try {
             String schema = loadDatabaseSchema();
             String generatedSql = generateSqlQuery(userQuery, schema);
@@ -159,18 +163,35 @@ public class MessageServiceImplementation implements MessageService {
         }
     }
 
+     public void processAndRespondOfAIWithUSER(String userQuery, String sessionId, Chat chat) throws IOException {
+        try {
+            String relevantSchema = schemaVectorService.findRelevantSchema(userQuery, 3);
+            generateResponseFromDataOfAIWithUser(relevantSchema, userQuery, sessionId, chat);
+
+        } catch (Exception e) {
+            handleError(sessionId, chat, e);
+        }
+    }
+
     private String loadDatabaseSchema() throws IOException {
         return new String(Files.readAllBytes(Paths.get(SCHEMA_FILE)));
     }
 
     private String generateSqlQuery(String userQuery, String schema) {
-        PromptTemplate sqlPromptTemplate = new PromptTemplate(
-                "Bạn là một trình tạo SQL và gợi ý các ý tưởng cơ bản cho ứng dụng web từ thiện. Schema:\n{db_schema}\n"
-                        +
-                        "Câu hỏi người dùng: {user_query}\n" +
-                        "Chỉ tạo truy vấn MySQL SELECT thô. Nếu không phải liên quan đến việc lấy dữ liệu từ Schema thì trả về 'NOT_DB_QUERY'."
-                        +
-                        "Nếu liên quan đến truy vấn MySQL thì kết quả phải bắt đầu trực tiếp bằng \"SELECT\".");
+        String requiredString = """
+                    Bạn là một chuyên gia tạo SQL MySQL.
+                    Dựa trên Schema CSDL dưới đây:
+                    ---
+                    {db_schema}
+                    ---
+                    Hãy viết một câu lệnh MySQL SELECT thô duy nhất cho yêu cầu của người dùng.
+                    Yêu cầu người dùng: {user_query}
+
+                    QUAN TRỌNG:
+                    1. Chỉ trả lời bằng câu lệnh SELECT. Bắt đầu bằng "SELECT".
+                    2. Nếu yêu cầu của người dùng không thể trả lời bằng cách truy vấn schema này (ví dụ: hỏi về thời tiết, gợi ý ý tưởng...), hãy trả về chuỗi "NOT_DB_QUERY".
+                """;
+        PromptTemplate sqlPromptTemplate = new PromptTemplate(requiredString);
 
         String sqlPrompt = sqlPromptTemplate.render(Map.of(
                 "db_schema", schema,
@@ -181,6 +202,8 @@ public class MessageServiceImplementation implements MessageService {
 
         return cleanAIResponse(fullGeneratedSql);
     }
+
+
 
     /**
      * Xử lý chat thông thường (không liên quan DB)
@@ -241,6 +264,23 @@ public class MessageServiceImplementation implements MessageService {
         streamResponse(responseFlux, sessionId, chat);
     }
 
+    private void generateResponseFromDataOfAIWithUser(String results, String userQuery,
+            String sessionId, Chat chat) {
+
+        PromptTemplate responsePromptTemplate = new PromptTemplate(
+                "Bạn là trợ lý AI cho trang web từ thiện. Dựa trên dữ liệu sau:\n{data}\n" +
+                        "Câu hỏi người dùng: {user_query}\n" +
+                        "Trả lời bằng tiếng Việt, ngắn gọn, tự nhiên như đang trò chuyện. " +
+                        "Nếu có số liệu, giải thích đơn giản. Không đề cập đến SQL hoặc dữ liệu thô.");
+
+        String responsePrompt = responsePromptTemplate.render(Map.of(
+                "data", results,
+                "user_query", userQuery));
+
+        Flux<ChatResponse> responseFlux = chatClient.prompt(responsePrompt).stream().chatResponse();
+        streamResponse(responseFlux, sessionId, chat);
+    }
+
     /**
      * Stream AI response và lưu vào DB
      */
@@ -258,7 +298,7 @@ public class MessageServiceImplementation implements MessageService {
                     String chunk = response.getResult().getOutput().getText();
                     fullResponse.append(chunk);
 
-                    // ✅ GỬI TỪNG CHUNK
+                    // GỬI TỪNG CHUNK
                     messagingTemplate.convertAndSend("/topic/chat/" + sessionId,
                             Map.of(
                                     "type", "STREAM_CHUNK",

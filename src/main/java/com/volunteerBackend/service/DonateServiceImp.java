@@ -12,13 +12,10 @@ import org.springframework.stereotype.Service;
 import com.volunteerBackend.config.RabbitMQConfig;
 import com.volunteerBackend.model.Donation;
 import com.volunteerBackend.model.User;
-import com.volunteerBackend.model.Notification.NotificationType;
-import com.volunteerBackend.payload.DonationSuccessEmailPayload;
+import com.volunteerBackend.payload.DonationSuccessEventPayload;
 import com.volunteerBackend.repository.DonationRepository;
 import com.volunteerBackend.request.DonateRequest;
-import com.volunteerBackend.request.NotificationRequest;
 import com.volunteerBackend.request.PaymentRequest;
-import com.volunteerBackend.type.CampaignStatus;
 import com.volunteerBackend.type.PaymentMethod;
 import com.volunteerBackend.type.PaymentStatus;
 import com.volunteerBackend.util.VnpayUtil;
@@ -36,13 +33,6 @@ public class DonateServiceImp implements DonateService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
-    @Autowired
-    private DashboardStatisticsService dashboardStatisticsService;
-
-    @Autowired
-    private NotificationService notificationService;
-
 
     @Override
     public List<Donation> getAllDonates() {
@@ -64,8 +54,8 @@ public class DonateServiceImp implements DonateService {
         return donationRepository.findById(donateID).orElse(null);
     }
 
-    public void CaculatePercent (Long campaignID) {
-        
+    public void CaculatePercent(Long campaignID) {
+
     }
 
     @Override
@@ -112,38 +102,21 @@ public class DonateServiceImp implements DonateService {
                 donation.setPaymentStatus(PaymentStatus.COMPLETED);
                 donationRepository.save(donation);
 
-                Boolean isTargetAmountReached = campaignService.isTargetAmountReached(donation.getCampaign().getId());
-                if (isTargetAmountReached) {
-                    campaignService.changeCampaignStatus(donation.getCampaign().getId(), CampaignStatus.TARGET_REACHED);
-                }
+                DonationSuccessEventPayload eventPayload = new DonationSuccessEventPayload();
+                eventPayload.setDonateId(donation.getId());
+                eventPayload.setCampaignId(donation.getCampaign().getId());
+                eventPayload.setUserId(donation.getDonor() != null ? donation.getDonor().getId() : null);
+                eventPayload.setAmount(donation.getAmount());
+                eventPayload.setDonorEmail(donation.getDonorEmail());
+                eventPayload.setDonorName(donation.getDonorName());
+                eventPayload.setProjectName(donation.getCampaign().getTitle());
+                eventPayload.setTransactionCode(donation.getVnpTransactionNo());
 
-                dashboardStatisticsService.updateTotalDonationsAmount(donation.getAmount());
-                dashboardStatisticsService.updateTotalSupportCount();
-
-                // Chuẩn bị payload để gửi email
-                DonationSuccessEmailPayload payload = new DonationSuccessEmailPayload();
-                payload.setTo(donation.getDonorEmail());
-                payload.setFullName(donation.getDonorName());
-                payload.setAmount(donation.getAmount());
-                payload.setProjectName(donation.getCampaign().getTitle());
-                payload.setTransactionCode(donation.getVnpTransactionNo());
-
-                NotificationRequest notificationRequest = new NotificationRequest();
-                notificationRequest.setUserId(donation.getDonor().getId());
-                notificationRequest.setTitle(donation.getCampaign().getTitle());
-                notificationRequest.setMessage("Bạn đã thanh toán thành công số tiền cho dự án " + donation.getCampaign().getTitle());
-                notificationRequest.setRelatedId(donation.getCampaign().getId());
-                notificationRequest.setType(NotificationType.DONATION);
-
-                //Khi người dùng hiện tại thanh toán thành công
-                notificationService.createNotification(notificationRequest);
-                // Đẩy vào RabbitMQ để một tiến trình khác xử lý việc gửi email
                 rabbitTemplate.convertAndSend(
-                        RabbitMQConfig.EXCHANGE_USER_NAME,
-                        RabbitMQConfig.ROUTING_KEY_SENT_EMAIL_DONATION_SUCCESS,
-                        payload);
-                
-                dashboardStatisticsService.getCaculatePercentage(donation.getCampaign().getId());
+                        RabbitMQConfig.EXCHANGE_DONATION_SUCCESS,
+                        "",
+                        eventPayload);
+
                 return "success";
             }
 
