@@ -20,14 +20,17 @@ import com.volunteerBackend.model.Category;
 
 import com.volunteerBackend.service.CategoryService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class CategoryController {
     
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
     
-    private CategoryMapper categoryMapper;
+    private final CategoryMapper categoryMapper;
 
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDTO>> getCategoriesForUser(

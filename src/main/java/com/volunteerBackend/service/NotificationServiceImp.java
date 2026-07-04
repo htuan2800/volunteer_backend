@@ -15,19 +15,22 @@ import com.volunteerBackend.repository.NotificationRepository;
 import com.volunteerBackend.repository.UserRepository;
 import com.volunteerBackend.request.NotificationRequest;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class NotificationServiceImp implements NotificationService {
     
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
 
     
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     
-    private NotificationMapper notificationMapper;
+    private final NotificationMapper notificationMapper;
     
     @Override
     public void createNotification(NotificationRequest notification) {

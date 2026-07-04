@@ -26,17 +26,19 @@ import com.volunteerBackend.service.FileStorageService;
 import com.volunteerBackend.type.FileType;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/files")
+@RequiredArgsConstructor
 public class FileController {
 
     
-    private FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
 
 
     
-    private CloudinaryStorageService cloudinaryStorageService;
+    private final CloudinaryStorageService cloudinaryStorageService;
 
     // Upload với FileType
     // @PostMapping("/upload")

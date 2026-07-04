@@ -16,14 +16,16 @@ import com.volunteerBackend.payload.EmailVerifyPayload;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EmailServiceImp implements EmailService {
 
     
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     @Value("${app.base-url}")
     private String baseUrl;

@@ -23,23 +23,27 @@ import com.volunteerBackend.request.CampaignRequest;
 import com.volunteerBackend.service.CampaignService;
 import com.volunteerBackend.service.OrganizerService;
 import com.volunteerBackend.type.CampaignStatus;
+
+import lombok.RequiredArgsConstructor;
+
 import com.volunteerBackend.mapper.CampaignMapper;
 import com.volunteerBackend.mapper.CampaignSummaryMapper;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class CampaignController {
     
-    private CampaignService campaignService;
+    private final CampaignService campaignService;
 
     
-    private OrganizerService organizerService;
+    private final OrganizerService organizerService;
 
     
-    private CampaignMapper campaignMapper;
+    private final CampaignMapper campaignMapper;
 
     
-    private CampaignSummaryMapper campaignSummaryMapper;
+    private final CampaignSummaryMapper campaignSummaryMapper;
 
     // Dành cho All
     @GetMapping("/campaigns")

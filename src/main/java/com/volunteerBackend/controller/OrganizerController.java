@@ -24,13 +24,16 @@ import com.volunteerBackend.model.Organizer;
 import com.volunteerBackend.request.OrganizerRequest;
 import com.volunteerBackend.service.OrganizerService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class OrganizerController {
     
-    private OrganizerService organizerService;
+    private final OrganizerService organizerService;
     
-    private OrganizerMapper organizerMapper;
+    private final OrganizerMapper organizerMapper;
 
     @GetMapping("/organizers/{organizerId}")
     public ResponseEntity<OrganizerDTO> getOrganizerById(@PathVariable Integer organizerId) throws UserException {

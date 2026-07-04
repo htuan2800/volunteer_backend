@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 import com.volunteerBackend.model.Category;
 import com.volunteerBackend.repository.CategoryRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImp implements CategoryService {
     
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     @Override
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();

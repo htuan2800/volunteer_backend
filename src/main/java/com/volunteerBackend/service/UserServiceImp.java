@@ -32,21 +32,23 @@ import com.volunteerBackend.request.UserRequest;
 import com.volunteerBackend.type.AuthProvider;
 import com.volunteerBackend.type.UserRole;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImp implements UserService {
-    private CloudinaryStorageService cloudinaryStorageService;
-    private DashboardStatisticsService dashboardStatisticsService;
-    UserRepository userRepository;
+    private final CloudinaryStorageService cloudinaryStorageService;
+    private final DashboardStatisticsService dashboardStatisticsService;
+    private final UserRepository userRepository;
 
     @Value("${app.verification.token-expiry}")
     private long tokenExpiryMs;
-    private PasswordEncoder passwordEncoder;
-    private RabbitTemplate rabbitTemplate;
-    private DonationRepository donationRepository;
-    private NotificationService notificationService;
+    private final PasswordEncoder passwordEncoder;
+    private final RabbitTemplate rabbitTemplate;
+    private final DonationRepository donationRepository;
+    private final NotificationService notificationService;
 
     @Override
     public boolean createUser(User user) throws UserException {

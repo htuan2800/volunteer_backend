@@ -25,9 +25,10 @@ import jakarta.transaction.Transactional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public CustomOAuth2UserService() {
+    public CustomOAuth2UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
         System.out.println("CustomOAuth2UserService initialized");
     }
 

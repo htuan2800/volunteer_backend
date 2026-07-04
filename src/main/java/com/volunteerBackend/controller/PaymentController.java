@@ -19,12 +19,13 @@ import com.volunteerBackend.response.VnPayIpnResponse;
 import com.volunteerBackend.service.DonateService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-
+@RequiredArgsConstructor
 public class PaymentController {
     
-    private DonateService donateService;
+    private final DonateService donateService;
 
     // @PutMapping("/payments/update_payment/{id}")
     // public ResponseEntity<?> updatePayment (@PathVariable String id, @RequestBody

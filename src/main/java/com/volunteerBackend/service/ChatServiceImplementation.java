@@ -14,15 +14,19 @@ import com.volunteerBackend.model.User;
 import com.volunteerBackend.repository.ChatRepository;
 import com.volunteerBackend.type.ChatType;
 import com.volunteerBackend.type.UserRole;
+
+import lombok.RequiredArgsConstructor;
+
 import com.volunteerBackend.mapper.ChatMapper;
 
 @Service
+@RequiredArgsConstructor
 public class ChatServiceImplementation implements ChatService {
 
     
-    private ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
     
-    private ChatMapper chatMapper;
+    private final ChatMapper chatMapper;
 
     @Override
     public Chat createChatAI(User reqUser) {

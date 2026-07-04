@@ -17,14 +17,17 @@ import com.volunteerBackend.model.CampaignImage;
 import com.volunteerBackend.request.CampaignImageRequest;
 import com.volunteerBackend.service.CampaignImageService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class CampaignImageController {
     
-    private CampaignImageService campaignImageService;
+    private final CampaignImageService campaignImageService;
 
     
-    private CampaignImageMapper campaignImageMapper;
+    private final CampaignImageMapper campaignImageMapper;
 
     @GetMapping("/admin/campaigns/images/{id}")
     public ResponseEntity<List<CampaignImageDTO>> getCampaignImages(@PathVariable Long id) {

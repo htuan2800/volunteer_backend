@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.volunteerBackend.config.JwtProvider;
 import com.volunteerBackend.exceptions.UserException;
 import com.volunteerBackend.model.User;
-import com.volunteerBackend.repository.UserRepository;
 import com.volunteerBackend.request.ChangePasswordRequest;
 import com.volunteerBackend.request.ForgorPasswordRequest;
 import com.volunteerBackend.request.LoginRequest;
@@ -35,14 +34,14 @@ import com.volunteerBackend.type.UserRole;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
     
-    UserService userService;
-    
-    UserRepository userRepository;
+    private final UserService userService;
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgorPasswordRequest request) throws UserException {

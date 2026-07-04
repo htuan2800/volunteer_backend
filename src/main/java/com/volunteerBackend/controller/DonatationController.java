@@ -24,22 +24,24 @@ import com.volunteerBackend.service.DonateService;
 import com.volunteerBackend.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class DonatationController {
     
-    private DonateService donatationService;
+    private final DonateService donatationService;
 
     
-    private UserService userService;
+    private final UserService userService;
 
     
-    private DonationSummaryMapper donationSummaryMapper;
+    private final DonationSummaryMapper donationSummaryMapper;
 
     
-    private DonaterMapper donaterMapper;
+    private final DonaterMapper donaterMapper;
 
     @PostMapping("/donates/add_donate")
     public ResponseEntity<String> CreateDonate(@RequestBody DonateRequest donateRequest, @RequestHeader(value = "Authorization", required = false) String jwt, HttpServletRequest request) throws Exception {

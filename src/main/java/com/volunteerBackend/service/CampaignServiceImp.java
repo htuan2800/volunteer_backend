@@ -25,24 +25,26 @@ import com.volunteerBackend.type.CampaignStatus;
 import com.volunteerBackend.type.PaymentStatus;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class CampaignServiceImp implements CampaignService {
-    private CampaignRepository campaignRepository;
+    private final CampaignRepository campaignRepository;
 
-    private IndexingService indexingService;
+    private final IndexingService indexingService;
 
-    private OrganizerRepository organizerRepository;
+    private final OrganizerRepository organizerRepository;
 
-    private CampaignImageRepository campaignImageRepository;
+    private final CampaignImageRepository campaignImageRepository;
 
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    private DonationRepository donationRepository;
+    private final DonationRepository donationRepository;
 
-    private DashboardStatisticsService dashboardStatisticsService;
+    private final DashboardStatisticsService dashboardStatisticsService;
 
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public boolean createCampaign(CampaignRequest request) {

@@ -25,6 +25,8 @@ import com.volunteerBackend.service.CampaignService;
 import com.volunteerBackend.service.UserService;
 import com.volunteerBackend.type.UserRole;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +39,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class UserController {
     
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     
-    UserService userService;
+    private final UserService userService;
 
     
     CampaignService campaignService;

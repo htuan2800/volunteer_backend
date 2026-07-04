@@ -3,6 +3,7 @@ package com.volunteerBackend.service;
 import java.util.Collections;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -19,13 +20,16 @@ import com.volunteerBackend.type.AuthProvider;
 import com.volunteerBackend.type.UserRole;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
     
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public CustomOidcUserService() {
+    @PostConstruct
+    public void init() {
         System.out.println("CustomOidcUserService initialized");
     }
 

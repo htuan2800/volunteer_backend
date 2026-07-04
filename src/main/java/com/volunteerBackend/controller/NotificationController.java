@@ -15,14 +15,17 @@ import com.volunteerBackend.mapper.NotificationMapper;
 import com.volunteerBackend.model.Notification;
 import com.volunteerBackend.service.NotificationService;
 
+import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class NotificationController {
     
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
     
-    private NotificationMapper notificationMapper;
+    private final NotificationMapper notificationMapper;
 
     @GetMapping("/notifications/user/{userId}")
     public ResponseEntity<List<NotificationDTO>> getNotifications(@PathVariable Long userId) {

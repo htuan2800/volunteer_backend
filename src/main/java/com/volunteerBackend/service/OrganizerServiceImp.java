@@ -9,13 +9,16 @@ import com.volunteerBackend.model.Organizer;
 import com.volunteerBackend.repository.OrganizerRepository;
 import com.volunteerBackend.request.OrganizerRequest;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class OrganizerServiceImp implements OrganizerService {
-    private OrganizerRepository organizerRepository;
+    private final OrganizerRepository organizerRepository;
 
-    private DashboardStatisticsService dashboardStatisticsService;
+    private final DashboardStatisticsService dashboardStatisticsService;
 
-    private CloudinaryStorageService cloudinaryStorageService;
+    private final CloudinaryStorageService cloudinaryStorageService;
 
     @Override
     public List<Organizer> getAllOrganizers() {

@@ -24,28 +24,30 @@ import com.volunteerBackend.util.MomoUtil;
 import com.volunteerBackend.util.VnpayUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DonateServiceImp implements DonateService {
     
-    private DonationRepository donationRepository;
+    private final DonationRepository donationRepository;
     
-    private VnPayService vnPayService;
+    private final VnPayService vnPayService;
     
-    private MomoService momoService;
+    private final MomoService momoService;
     
-    private CampaignService campaignService;
+    private final CampaignService campaignService;
 
     
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     
-    private VnpayConfig vnpayConfig;
+    private final VnpayConfig vnpayConfig;
 
     
-    private MomoConfig momoConfig;
+    private final MomoConfig momoConfig;
 
     @Override
     public List<Donation> getAllDonates() {

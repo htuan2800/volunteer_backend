@@ -14,13 +14,16 @@ import com.volunteerBackend.model.User;
 import com.volunteerBackend.service.ChatService;
 import com.volunteerBackend.service.UserService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ChatController {
     
-    private ChatService chatService;
+    private final ChatService chatService;
     
-    private UserService userService;
+    private final UserService userService;
 
     // @PostMapping("/api/chats")
     // public Chat createChat(@RequestHeader("Authorization") String jwt, @RequestBody CreateChatRequest req)

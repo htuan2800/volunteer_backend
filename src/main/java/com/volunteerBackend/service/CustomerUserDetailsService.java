@@ -14,10 +14,13 @@ import org.springframework.stereotype.Service;
 import com.volunteerBackend.model.User;
 import com.volunteerBackend.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CustomerUserDetailsService implements UserDetailsService {
     
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

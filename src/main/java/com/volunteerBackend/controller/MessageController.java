@@ -19,22 +19,18 @@ import com.volunteerBackend.service.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 @RestController
+@RequiredArgsConstructor
 public class MessageController {
     
-    private MessageService messageService;
+    private final MessageService messageService;
     
-    private UserService userService;
+    private final UserService userService;
 
     private final SimpMessagingTemplate messagingTemplate;
     @PersistenceContext
     private EntityManager entityManager;
-
-    public MessageController(
-            SimpMessagingTemplate messagingTemplate, EntityManager entityManager) {
-        this.messagingTemplate = messagingTemplate;
-        this.entityManager = entityManager;
-    }
 
     @MessageMapping("/chat/send")
     @Transactional
