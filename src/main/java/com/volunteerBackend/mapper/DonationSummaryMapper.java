@@ -11,9 +11,10 @@ import com.volunteerBackend.model.Donation;
 public class DonationSummaryMapper {
     public DonateSummaryDTO toDTOBasic(Donation donation) {
         DonateSummaryDTO dto = new DonateSummaryDTO();
-        if (donation.getIsAnonymous()) {
-            dto.setFullName("Nhà hảo tâm ẩn danh");
+        if(donation.getIsAnonymous()) {
+            dto.setFullName("Người ủng hộ ẩn danh");
         } else {
+            
             dto.setFullName(donation.getDonorName());
         }
         dto.setAmount(donation.getAmount());

@@ -20,7 +20,7 @@ public class DonaterDTO {
     private String message;
     private Boolean isAnonymous;
     private PaymentMethod paymentMethod;
-    private String vnpTransactionNo;
+    private String TransactionNo;
     private PaymentStatus paymentStatus;
     private LocalDateTime createdAt;
     private LocalDateTime paymentDate;

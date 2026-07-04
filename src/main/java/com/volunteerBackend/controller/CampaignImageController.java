@@ -2,7 +2,7 @@ package com.volunteerBackend.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,10 +20,10 @@ import com.volunteerBackend.service.CampaignImageService;
 @RestController
 @RequestMapping("/api")
 public class CampaignImageController {
-    @Autowired
+    
     private CampaignImageService campaignImageService;
 
-    @Autowired
+    
     private CampaignImageMapper campaignImageMapper;
 
     @GetMapping("/admin/campaigns/images/{id}")

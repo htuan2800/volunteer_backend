@@ -6,16 +6,17 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.volunteerBackend.DTO.UserDTO;
-import com.volunteerBackend.config.FileStorageProperties;
 import com.volunteerBackend.model.User;
 
 @Component
 public class UserMapper {
-    private final FileStorageProperties fileStorageProperties;
+    private final Cloudinary cloudinary;
 
-    public UserMapper(FileStorageProperties fileStorageProperties) {
-        this.fileStorageProperties = fileStorageProperties;
+    public UserMapper(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
     }
 
     public UserDTO toDTO(User user) {
@@ -32,7 +33,15 @@ public class UserMapper {
             if (user.getAvatar().startsWith("http")) {
                 dto.setAvatar(user.getAvatar());
             } else {
-                dto.setAvatar(fileStorageProperties.getBaseUrl() + user.getAvatar());
+                var transformation = new Transformation<>()
+                        .width(800)
+                        .crop("scale")
+                        .quality("auto")
+                        .fetchFormat("auto");
+                String eagerUrl = cloudinary.url()
+                        .transformation(transformation)
+                        .generate(user.getAvatar());
+                dto.setAvatar(eagerUrl);
             }
         } else {
             dto.setAvatar(null);
@@ -40,7 +49,17 @@ public class UserMapper {
 
         // dto.setAvatar(user.getAvatar());
         if (user.getCoverPhotoURL() != null) {
-            dto.setCoverPhotoURL(fileStorageProperties.getBaseUrl() + user.getCoverPhotoURL());
+            dto.setPublicIDCoverPhoto(user.getCoverPhotoURL());
+            var transformation = new Transformation<>()
+                    .width(800)
+                    .crop("scale")
+                    .quality("auto")
+                    .fetchFormat("auto");
+            String eagerUrl = cloudinary.url()
+                    .transformation(transformation)
+                    .generate(user.getCoverPhotoURL());
+            dto.setCoverPhotoURL(eagerUrl);
+
         }
         dto.setRole(user.getRole());
         dto.setCreatedAt(user.getCreatedAt());

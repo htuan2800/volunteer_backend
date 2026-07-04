@@ -4,14 +4,17 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
 import org.springframework.stereotype.Service;
 
+import com.volunteerBackend.config.RabbitMQConfig;
 import com.volunteerBackend.model.Campaign;
 import com.volunteerBackend.model.CampaignImage;
 import com.volunteerBackend.model.Category;
 import com.volunteerBackend.model.Organizer;
 import com.volunteerBackend.model.User;
+import com.volunteerBackend.payload.CampaignStatusPayload;
 import com.volunteerBackend.repository.CampaignImageRepository;
 import com.volunteerBackend.repository.CampaignRepository;
 import com.volunteerBackend.repository.CategoryRepository;
@@ -25,23 +28,21 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class CampaignServiceImp implements CampaignService {
-    @Autowired
     private CampaignRepository campaignRepository;
 
-    @Autowired
+    private IndexingService indexingService;
+
     private OrganizerRepository organizerRepository;
 
-    @Autowired
     private CampaignImageRepository campaignImageRepository;
 
-    @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
     private DonationRepository donationRepository;
 
-    @Autowired
     private DashboardStatisticsService dashboardStatisticsService;
+
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public boolean createCampaign(CampaignRequest request) {
@@ -74,7 +75,6 @@ public class CampaignServiceImp implements CampaignService {
 
         dashboardStatisticsService.updateTotalCampaigns();
 
-
         return true;
     }
 
@@ -99,14 +99,17 @@ public class CampaignServiceImp implements CampaignService {
         if (status != null && !"null".equals(status)) {
             campaignStatus = CampaignStatus.valueOf(status);
         }
-        if(categoryID == null) return campaignRepository.findByStatusOrTitle(campaignStatus, keyword);
+        if (categoryID == null)
+            return campaignRepository.findByStatusAndTitleContainingIgnoreCase(campaignStatus, keyword);
         Category category = categoryRepository.findById(categoryID).orElse(null);
-        return campaignRepository.findByCategoryAndStatusOrTitle(category, campaignStatus, keyword);
+        return campaignRepository.findByCategoryAndStatusAndTitleContainingIgnoreCase(category, campaignStatus,
+                keyword);
     }
 
     @Override
     public boolean isTargetAmountReached(Long campaignId) {
-        BigDecimal donateAmount = campaignRepository.sumCompletedDonationsByCampaign(campaignId, PaymentStatus.COMPLETED);
+        BigDecimal donateAmount = campaignRepository.sumCompletedDonationsByCampaign(campaignId,
+                PaymentStatus.COMPLETED);
         Campaign campaign = campaignRepository.findById(campaignId).orElse(null);
         return donateAmount.compareTo(campaign.getTargetAmount()) >= 0;
     }
@@ -117,7 +120,47 @@ public class CampaignServiceImp implements CampaignService {
         if (campaignOptional.isPresent()) {
             Campaign campaign = campaignOptional.get();
             campaign.setStatus(status);
-            campaignRepository.save(campaign);
+            Campaign savedCampaign = campaignRepository.save(campaign);
+            switch (status) {
+                case IN_PROGRESS:
+                    try {
+                        indexingService.indexSingleCampaign(savedCampaign);
+                    } catch (Exception e) {
+                        System.err.println("Lỗi index vector khi tạo campaign: " + e.getMessage());
+                    }
+                    break;
+                case ENDED:
+                    try {
+                        indexingService.updateIndexedCampaign(savedCampaign);
+                    } catch (Exception e) {
+                        System.err.println("Lỗi index vector khi update campaign: " + e.getMessage());
+                    }
+                    break;
+                case PAUSED:
+                    try {
+                        indexingService.updateIndexedCampaign(savedCampaign);
+                    } catch (Exception e) {
+                        System.err.println("Lỗi index vector khi update campaign: " + e.getMessage());
+                    }
+                    break;
+                case TARGET_REACHED:
+                    try {
+                        indexingService.updateIndexedCampaign(savedCampaign);
+                    } catch (Exception e) {
+                        System.err.println("Lỗi index vector khi update campaign: " + e.getMessage());
+                    }
+                    break;
+                default:
+                    break;
+            }
+            CampaignStatusPayload eventPayload = new CampaignStatusPayload();
+            eventPayload.setCampaignId(savedCampaign.getId());
+            eventPayload.setStatus(status);
+            eventPayload.setTitle(savedCampaign.getTitle());
+            rabbitTemplate.convertAndSend(
+                        RabbitMQConfig.EXCHANGE_CAMPAIGN_STATUS,
+                        "",
+                        eventPayload);
             return true;
         } else {
             return false;
@@ -129,12 +172,12 @@ public class CampaignServiceImp implements CampaignService {
         return campaignRepository.findById(campaignId).orElse(null);
     }
 
-
     @Override
     public Campaign getCampaignToUpdate(Long campaignId) {
         Campaign campaign = campaignRepository.findById(campaignId).orElse(null);
-        if(campaign.getStatus() == CampaignStatus.IN_PROGRESS) return campaign;
-        return  null;
+        if (campaign.getStatus() == CampaignStatus.IN_PROGRESS)
+            return campaign;
+        return null;
     }
 
     @Override
@@ -151,6 +194,11 @@ public class CampaignServiceImp implements CampaignService {
         campaignToUpdate.setEndDate(campaign.getEndDate());
         campaignToUpdate.setStoryInfo(campaign.getStoryInfo());
         campaignRepository.save(campaignToUpdate);
+        // try {
+        //     indexingService.updateIndexedCampaign(savedCampaign);
+        // } catch (Exception e) {
+        //     System.err.println("Lỗi index vector khi xóa campaign: " + e.getMessage());
+        // }
         return true;
     }
 

@@ -1,16 +1,13 @@
 package com.volunteerBackend.controller;
+
 import java.util.Map;
 import org.springframework.http.HttpHeaders;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +29,6 @@ import com.volunteerBackend.response.ApiResponse;
 import com.volunteerBackend.response.AuthResponse;
 import com.volunteerBackend.response.ErrorResponse;
 import com.volunteerBackend.response.RegisterResponse;
-import com.volunteerBackend.service.CustomerUserDetailsService;
 import com.volunteerBackend.service.UserService;
 import com.volunteerBackend.type.UserRole;
 
@@ -43,22 +39,20 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired
+    
     UserService userService;
-    @Autowired
+    
     UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private CustomerUserDetailsService customerUserDetailsService;
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgorPasswordRequest request) throws UserException {
         boolean isSuccess = userService.forgotPassword(request.getEmail());
         return ResponseEntity.ok(new ApiResponse("Email sent successfully", isSuccess));
     }
+
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, @RequestHeader(value = "Authorization", required = false) String jwt) throws UserException {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request,
+            @RequestHeader(value = "Authorization", required = false) String jwt) throws UserException {
         User user = userService.findUserByJwt(jwt);
         boolean isSuccess = userService.changePassword(request, user);
         if (isSuccess) {
@@ -67,6 +61,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new ApiResponse("Password change failed", false));
         }
     }
+
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) throws UserException {
         boolean isSuccess = userService.resetPassword(request);
@@ -76,61 +71,59 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new ApiResponse("Password reset failed", false));
         }
     }
+
     @PostMapping("/signup")
     public RegisterResponse createUser(@RequestBody RegisterRequest user) throws Exception {
         User savedUser = userService.registerUser(user);
 
-        RegisterResponse registerResponse = new RegisterResponse("User registered successfully", savedUser.getVerificationToken(), true);
+        RegisterResponse registerResponse = new RegisterResponse("User registered successfully",
+                savedUser.getVerificationToken(), true);
         return registerResponse;
     }
 
     @GetMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@RequestParam String token) {
         boolean isVerified = userService.verifyEmail(token);
-        
+
         if (isVerified) {
             return ResponseEntity.ok(new ApiResponse(
-                "Email đã được xác nhận thành công!", 
-                true
-            ));
+                    "Email đã được xác nhận thành công!",
+                    true));
         } else {
             return ResponseEntity.badRequest()
-                .body(new ApiResponse(
-                    "Token không hợp lệ hoặc đã hết hạn hoặc email đã được xác nhận trước đó.", 
-                    false
-                ));
+                    .body(new ApiResponse(
+                            "Token không hợp lệ hoặc đã hết hạn hoặc email đã được xác nhận trước đó.",
+                            false));
         }
     }
 
     @PostMapping("/resend-verification")
     public ResponseEntity<?> resendVerificationEmail(@RequestBody Map<String, String> request) {
         String email = request.get("email");
+        System.out.println("Email: " + email);
         userService.resendVerificationEmail(email);
         return ResponseEntity.ok(new ApiResponse("Verification email resent successfully", true));
     }
-    
 
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        Authentication authentication = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         User user = userService.findUserByEmail(loginRequest.getEmail());
-
         if (user == null) {
             throw new BadCredentialsException("User not found");
-        } else if("ADMIN".equals((loginRequest.getRole())) && !user.getRole().equals(UserRole.ADMIN)){
+        } else if ("ADMIN".equals((loginRequest.getRole())) && !user.getRole().equals(UserRole.ADMIN)) {
+            throw new BadCredentialsException("Cannot access with this account");
+        } else if ("USER".equals((loginRequest.getRole())) && !user.getRole().equals(UserRole.USER)) {
             throw new BadCredentialsException("Cannot access with this account");
         } else if (!user.getIsVerified()) {
             AuthResponse res = new AuthResponse(null, "Login failed", user.getIsVerified());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+        } else if(user.getIsDeleted() || !user.getIsActive()) {
+            AuthResponse res = new AuthResponse(null, "Login failed", user.getIsVerified());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
-        }
+        } 
+        String accessToken = JwtProvider.generateToken(user);
+        String refreshToken = JwtProvider.generateRefreshToken(user);
 
-        // Tạo Access Token (ngắn hạn)
-        String accessToken = JwtProvider.generateToken(authentication, user);
-
-        // Tạo Refresh Token (dài hạn)
-        String refreshToken = JwtProvider.generateRefreshToken(authentication, user);
-
-        // ---- Set refreshToken vào HttpOnly cookie ----
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true) // Không cho JS truy cập
                 .secure(false) // Chỉ gửi qua HTTPS
@@ -139,7 +132,7 @@ public class AuthController {
                 .sameSite("Lax") // Ngăn CSRF (có thể dùng "Lax" nếu cần cross-site)
                 .build();
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString()); //Thêm một header Set-Cookie vào trong HTTP Response.
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         // Trả accessToken về cho frontend
         AuthResponse res = new AuthResponse(accessToken, "Login successfully", user.getIsVerified());
@@ -173,17 +166,6 @@ public class AuthController {
 
         String newAccessToken = JwtProvider.refreshAccessToken(user);
         return ResponseEntity.ok(new AuthResponse(newAccessToken, "Token refreshed", user.getIsVerified()));
-    }
-
-    private Authentication authenticate(String email, String password) {
-        UserDetails userDetails = customerUserDetailsService.loadUserByUsername(email);
-        if (userDetails == null) {
-            throw new BadCredentialsException("Invalid username");
-        }
-        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Password not matched");
-        }
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
     @PostMapping("/logout")

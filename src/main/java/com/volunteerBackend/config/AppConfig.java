@@ -1,9 +1,6 @@
 package com.volunteerBackend.config;
-
 import java.util.Arrays;
 import java.util.Collections;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,19 +20,18 @@ import com.volunteerBackend.service.CustomOidcUserService;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @Configuration // Đánh dấu lớp này là một lớp cấu hình của Spring.
 @EnableWebSecurity // Kích hoạt Spring Security cho ứng dụng.
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class AppConfig {
-    @Autowired
-    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
-    @Autowired
-    private CustomOidcUserService customOidcUserService;
-
-    @Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final CustomOidcUserService customOidcUserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @PostConstruct
     public void init() {
@@ -47,8 +43,14 @@ public class AppConfig {
         http.sessionManagement(
                 management -> management.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS)) // Spring Security sẽ không tạo hoặc lưu trữ session.
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint) // <-- Dùng EntryPoint của bạn
+                )
+
                 .authorizeHttpRequests(Authorize -> Authorize
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // only ADMIN
+                        .requestMatchers("/api/notifications/**").authenticated()
+                        .requestMatchers("/api/users/profile").authenticated()
                         .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                     .userInfoEndpoint(userInfo -> userInfo
@@ -62,7 +64,6 @@ public class AppConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
         // .httpBasic(withDefaults())
         // .formLogin(withDefaults());
-        // Tắt bảo vệ CSRF vì ứng dụng REST API thường sử dụng JWT, không cần cơ chế bảo vệ CSRF.
         return http.build();
     }
 

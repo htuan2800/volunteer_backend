@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentRequest {
-    private String vnp_TxnRef;
-    private String vnp_TransactionNo;
-    private String vnp_BankTranNo;
-    private String vnp_BankCode;
-    private String vnp_ResponseCode;
-    private String vnp_PayDate;
+    private String orderId;
+    private String transactionId;
+    private String bankCode;
+    private String ResponseCode;
+    private String payDate;
 }

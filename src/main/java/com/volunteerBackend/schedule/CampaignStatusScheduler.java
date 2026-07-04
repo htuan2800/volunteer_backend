@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.volunteerBackend.model.Campaign;
 import com.volunteerBackend.repository.CampaignRepository;
+import com.volunteerBackend.service.IndexingService;
 import com.volunteerBackend.type.CampaignStatus;
 
 import java.time.LocalDate;
@@ -11,9 +12,10 @@ import java.util.List;
 @Component
 public class CampaignStatusScheduler {
     private final CampaignRepository campaignRepository;
-
-    public CampaignStatusScheduler(CampaignRepository campaignRepository) {
+    private final IndexingService indexingService;
+    public CampaignStatusScheduler(CampaignRepository campaignRepository, IndexingService indexingService) {
         this.campaignRepository = campaignRepository;
+        this.indexingService = indexingService;
     }
     @Scheduled(cron = "0 1 0 * * ?")
     public void updateEndedCampaigns() {
@@ -23,6 +25,7 @@ public class CampaignStatusScheduler {
 
         for (Campaign campaign : campaignsToUpdate) {
             campaign.setStatus(CampaignStatus.ENDED);
+            indexingService.updateIndexedCampaign(campaign);
         }
 
         campaignRepository.saveAll(campaignsToUpdate);

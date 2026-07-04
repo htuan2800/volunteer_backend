@@ -1,8 +1,6 @@
 package com.volunteerBackend.service;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.volunteerBackend.DTO.OrganizerStatsDTO;
@@ -13,14 +11,11 @@ import com.volunteerBackend.request.OrganizerRequest;
 
 @Service
 public class OrganizerServiceImp implements OrganizerService {
-    @Autowired
     private OrganizerRepository organizerRepository;
 
-    @Autowired
     private DashboardStatisticsService dashboardStatisticsService;
 
-    @Autowired
-    private FileStorageService fileStorageService;
+    private CloudinaryStorageService cloudinaryStorageService;
 
     @Override
     public List<Organizer> getAllOrganizers() {
@@ -80,7 +75,7 @@ public class OrganizerServiceImp implements OrganizerService {
         existingOrganizer.setSlug(organizer.getSlug());
         if(organizer.getOption().equals("IMAGE"))
         {
-            fileStorageService.deleteFile(existingOrganizer.getLogoUrl());
+            cloudinaryStorageService.deleteFile(existingOrganizer.getLogoUrl());
             existingOrganizer.setLogoUrl(organizer.getLogoUrl());
         }
         existingOrganizer.setHotline(organizer.getHotline());

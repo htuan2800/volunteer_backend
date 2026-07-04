@@ -2,7 +2,7 @@ package com.volunteerBackend.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +23,10 @@ import com.volunteerBackend.service.CategoryService;
 @RestController
 @RequestMapping("/api")
 public class CategoryController {
-    @Autowired
+    
     private CategoryService categoryService;
 
-    @Autowired
+    
     private CategoryMapper categoryMapper;
 
     @GetMapping("/categories")

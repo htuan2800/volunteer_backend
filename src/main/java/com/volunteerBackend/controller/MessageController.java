@@ -2,7 +2,7 @@ package com.volunteerBackend.controller;
 
 import java.io.IOException;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,9 +21,9 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 @RestController
 public class MessageController {
-    @Autowired
+    
     private MessageService messageService;
-    @Autowired
+    
     private UserService userService;
 
     private final SimpMessagingTemplate messagingTemplate;

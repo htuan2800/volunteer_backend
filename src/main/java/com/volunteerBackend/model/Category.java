@@ -30,7 +30,7 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column
     private String slug;
 
     @Column(columnDefinition = "TEXT")

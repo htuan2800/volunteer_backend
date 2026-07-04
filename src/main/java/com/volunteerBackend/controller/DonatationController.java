@@ -1,9 +1,7 @@
 package com.volunteerBackend.controller;
-
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,22 +29,22 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/api")
 public class DonatationController {
-    @Autowired
+    
     private DonateService donatationService;
 
-    @Autowired
+    
     private UserService userService;
 
-    @Autowired
+    
     private DonationSummaryMapper donationSummaryMapper;
 
-    @Autowired
+    
     private DonaterMapper donaterMapper;
 
     @PostMapping("/donates/add_donate")
-    public ResponseEntity<String> CreateDonate(@RequestBody DonateRequest donateRequest, @RequestHeader(value = "Authorization", required = false) String jwt, HttpServletRequest request) throws UnsupportedEncodingException {
+    public ResponseEntity<String> CreateDonate(@RequestBody DonateRequest donateRequest, @RequestHeader(value = "Authorization", required = false) String jwt, HttpServletRequest request) throws Exception {
         User user = userService.findUserByJwt(jwt);
-        System.out.println(donateRequest.getDonor_amount() + " " + donateRequest.getDonor_email() + " " + donateRequest.getDonor_name() + " " + donateRequest.getDonor_phone() + " " + donateRequest.getMessage());
+        System.out.println(donateRequest.getDonor_amount() + " " + donateRequest.getDonor_email() + " " + donateRequest.getDonor_name() + " " + donateRequest.getDonor_phone() + " " + donateRequest.getMessage() + " " + donateRequest.isAnonymous() + " " + donateRequest.getPaymentMethod());
         String result = donatationService.createDonate(request, donateRequest, user);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

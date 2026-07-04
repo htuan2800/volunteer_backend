@@ -7,24 +7,26 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import com.volunteerBackend.model.Campaign;
 import com.volunteerBackend.model.Category;
 import com.volunteerBackend.model.Organizer;
 import com.volunteerBackend.type.CampaignStatus;
 import com.volunteerBackend.type.PaymentStatus;
 
-@Repository
 public interface CampaignRepository extends JpaRepository<Campaign, Long> {
     List<Campaign> findByTitleContainingIgnoreCase(String title);
     boolean existsByTitle(String title);
     Campaign findByIdAndStatus( Long id, CampaignStatus status);
     List<Campaign> findByOrganizerAndStatus( Organizer organizer, CampaignStatus status);
-    List<Campaign>findByStatusOrTitle(CampaignStatus status, String title);
-    List<Campaign>findByCategoryAndStatusOrTitle(Category category, CampaignStatus status, String title);
+    List<Campaign>findByStatusAndTitleContainingIgnoreCase(CampaignStatus status, String title);
+    List<Campaign>findByCategoryAndStatusAndTitleContainingIgnoreCase(Category category, CampaignStatus status, String title);
 
-    @Query("SELECT c FROM Campaign c WHERE c.status IN ('IN_PROGRESS', 'TARGET_REACHED', 'PAUSED') AND c.endDate < :currentDate")
+    @Query("SELECT c FROM Campaign c JOIN FETCH c.category JOIN FETCH c.organizer")
+    List<Campaign> findAllWithDetails();
+
+    @Query("SELECT c FROM Campaign c JOIN FETCH c.category JOIN FETCH c.organizer WHERE c.id = :id")
+    Campaign findByIdWithDetails(Long id);
+    @Query("SELECT c FROM Campaign c WHERE c.status IN ('IN_PROGRESS', 'PAUSED') AND c.endDate < :currentDate")
     List<Campaign> findActiveCampaignsPastEndDate(LocalDate currentDate);
 
     @Query("SELECT SUM(d.amount) FROM Donation d WHERE d.campaign.id = :campaignId AND d.paymentStatus = :status")

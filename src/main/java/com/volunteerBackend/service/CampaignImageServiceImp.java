@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.volunteerBackend.model.Campaign;
@@ -14,14 +14,20 @@ import com.volunteerBackend.repository.CampaignImageRepository;
 import com.volunteerBackend.repository.CampaignRepository;
 import com.volunteerBackend.request.CampaignImageRequest;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CampaignImageServiceImp implements CampaignImageService {
 
-    @Autowired
-    private CampaignImageRepository campaignImageRepository;
+    
+    private final CampaignImageRepository campaignImageRepository;
 
-    @Autowired
-    private CampaignRepository campaignRepository;
+    
+    private final CampaignRepository campaignRepository;
+
+    
+    private final CloudinaryStorageService cloudinaryStorageService;
 
     @Override
     public List<CampaignImage> getCampaignImages(Long campaignId) {
@@ -72,9 +78,17 @@ public class CampaignImageServiceImp implements CampaignImageService {
 
         // Bước 5: Xóa những ảnh còn sót lại trong map (ảnh đã bị xóa ở client)
         if (!oldImageMap.isEmpty()) {
+            deleteMultipleFiles(oldImageMap);
             campaignImageRepository.deleteAll(oldImageMap.values());
         }
 
         return true;
+    }
+
+
+    public void deleteMultipleFiles(Map<Long, CampaignImage> oldImageMap) {
+        for (CampaignImage campaignImage : oldImageMap.values()) {
+            cloudinaryStorageService.deleteFile(campaignImage.getImageUrl());
+        }
     }
 }

@@ -6,17 +6,20 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.volunteerBackend.DTO.OrganizerDTO;
-import com.volunteerBackend.config.FileStorageProperties;
 import com.volunteerBackend.model.Organizer;
 
 
 @Component
 public class OrganizerMapper {
-    private final FileStorageProperties fileStorageProperties;
 
-    public OrganizerMapper(FileStorageProperties fileStorageProperties) {
-        this.fileStorageProperties = fileStorageProperties;
+    private final Cloudinary cloudinary;
+
+
+    public OrganizerMapper(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
     }
     public OrganizerDTO toDTO(Organizer organizer) {
         if (organizer == null)
@@ -27,7 +30,16 @@ public class OrganizerMapper {
         dto.setName(organizer.getName());
         dto.setSlug(organizer.getSlug());
         dto.setDescription(organizer.getDescription());
-        dto.setLogoUrl( fileStorageProperties.getBaseUrl() + organizer.getLogoUrl());
+        var transformation = new Transformation<>()
+                    .crop("scale")
+                    .width(200)
+                    .height(200)
+                    .fetchFormat("auto")
+                    .quality("auto");
+        String eagerUrl = cloudinary.url()
+                    .transformation(transformation)
+                    .generate(organizer.getLogoUrl());
+        dto.setLogoUrl(eagerUrl);
         dto.setHotline(organizer.getHotline());
         dto.setEmail(organizer.getEmail());
         dto.setActive(organizer.getIsActive());

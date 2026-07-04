@@ -5,13 +5,12 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
+
 
 import com.volunteerBackend.model.Chat;
 import com.volunteerBackend.model.User;
 import com.volunteerBackend.type.ChatType;
 
-@Repository
 public interface ChatRepository extends JpaRepository<Chat, Integer> {
     @Query("SELECT DISTINCT c FROM Chat c JOIN c.messages m")
     List<Chat> findAllWithMessages();

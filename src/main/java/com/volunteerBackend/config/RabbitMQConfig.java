@@ -5,7 +5,9 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +37,12 @@ public class RabbitMQConfig {
     public static final String QUEUE_DONATION_SUCCESS_NOTIFICATION = "donation.success.create_notification.queue";
     public static final String QUEUE_DONATION_SUCCESS_DASHBOARD = "donation.success.update_dashboard.queue";
     public static final String QUEUE_DONATION_SUCCESS_CAMPAIGN = "donation.success.update_campaign.queue";
+
+
+    // ====== BEANS FOR UPDATE CAMPAIGN STATUS EVENT ======
+    public static final String EXCHANGE_CAMPAIGN_STATUS= "campaign.status.exchange";
+    public static final String QUEUE_CAMPAIGN_STATUS_NOTIFICATION = "campaign.status.create_notification.queue";
+    public static final String QUEUE_CAMPAIGN_STATUS_CAMPAIGN = "campaign.status.update_campaign.queue";
 
     @Bean
     public TopicExchange userExchange() {
@@ -152,9 +160,52 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(donationSuccessCampaignQueue).to(donationSuccessExchange);
     }
 
+    // ====== BEANS FOR UPDATE CAMPAIGN SUCCESS EVENT ======
+    @Bean
+    public FanoutExchange campaignStatusExchange() {
+        return new FanoutExchange(EXCHANGE_CAMPAIGN_STATUS);
+    }
+
+    @Bean
+    public Queue campaignStatusNotificationQueue() {
+        return new Queue(QUEUE_CAMPAIGN_STATUS_NOTIFICATION, true);
+    }
+
+    @Bean
+    public Queue campaignStatusCampaignQueue() {
+        return new Queue(QUEUE_CAMPAIGN_STATUS_CAMPAIGN, true);
+    }
+
+    @Bean
+    public Binding campaignNotificationBinding(Queue campaignStatusNotificationQueue,
+            FanoutExchange campaignStatusExchange) {
+        return BindingBuilder.bind(campaignStatusNotificationQueue).to(campaignStatusExchange);
+    }
+
+    @Bean
+    public Binding campaignCampaignBinding(Queue campaignStatusCampaignQueue,
+            FanoutExchange campaignStatusExchange) {
+        return BindingBuilder.bind(campaignStatusCampaignQueue).to(campaignStatusExchange);
+    }
+
     // Giúp RabbitMQ tự động chuyển đổi object Java sang JSON và ngược lại
     @Bean
     public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+        return new JacksonJsonMessageConverter();
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory myFactory(
+            ConnectionFactory connectionFactory,
+            MessageConverter jsonMessageConverter) {
+                                                     
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setConcurrentConsumers(5);
+        factory.setMaxConcurrentConsumers(10);
+        
+        factory.setMessageConverter(jsonMessageConverter); 
+        
+        return factory;
     }
 }

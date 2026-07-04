@@ -5,27 +5,29 @@ import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 
 import org.springframework.stereotype.Component;
 
 import com.volunteerBackend.DTO.CampaignSummaryDTO;
-import com.volunteerBackend.config.FileStorageProperties;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.volunteerBackend.DTO.CampaignImageDTO;
 import com.volunteerBackend.model.Campaign;
 import com.volunteerBackend.model.Donation;
+import com.volunteerBackend.type.PaymentStatus;
 
 @Component
 public class CampaignSummaryMapper {
 
     private final OrganizerMapper organizerMapper;
 
-    private final FileStorageProperties fileStorageProperties;
+    private final Cloudinary cloudinary;
 
-    public CampaignSummaryMapper(OrganizerMapper organizerMapper, FileStorageProperties fileStorageProperties) {
-        this.fileStorageProperties = fileStorageProperties;
+    public CampaignSummaryMapper(OrganizerMapper organizerMapper,
+            Cloudinary cloudinary) {
         this.organizerMapper = organizerMapper;
+        this.cloudinary = cloudinary;
     }
 
     public CampaignSummaryDTO toDTOBasic(Campaign campaign) {
@@ -34,13 +36,23 @@ public class CampaignSummaryMapper {
         dto.setTitle(campaign.getTitle());
         dto.setTargetAmount(campaign.getTargetAmount());
         dto.setCurrentAmount(caculateCurrentAmount(campaign));
-        dto.setFeaturedImage(fileStorageProperties.getBaseUrl() + campaign.getFeaturedImage());
+        var transformation = new Transformation<>()
+                .width(800)
+                .crop("scale")
+                .quality("auto")
+                .fetchFormat("auto");
+        String eagerUrl = cloudinary.url()
+                .transformation(transformation)
+                .generate(campaign.getFeaturedImage());
+        dto.setFeaturedImage(eagerUrl);
+        // dto.setFeaturedImage(fileStorageProperties.getBaseUrl() +
+        // campaign.getFeaturedImage());
         dto.setStoryInfo(campaign.getStoryInfo());
         dto.setSupportCount(campaign.getDonations().size());
         dto.setOrganizer(organizerMapper.toDTO(campaign.getOrganizer()));
         dto.setStatus(campaign.getStatus());
         // Period period = Period.between(LocalDate.now(), campaign.getEndDate());
-        LocalDate startDate = LocalDate.now(); 
+        LocalDate startDate = LocalDate.now();
         LocalDate endDate = campaign.getEndDate();
         long totalDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
         dto.setDayLeft(totalDaysBetween);
@@ -53,6 +65,7 @@ public class CampaignSummaryMapper {
 
         // Tính tổng tiền donate
         BigDecimal totalAmount = donations.stream()
+                .filter(d -> d.getPaymentStatus() == PaymentStatus.COMPLETED)
                 .map(Donation::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -69,12 +82,13 @@ public class CampaignSummaryMapper {
 
         // Tính tổng tiền donate
         BigDecimal totalAmount = donations.stream()
+                .filter(d -> d.getPaymentStatus() == PaymentStatus.COMPLETED)
                 .map(Donation::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Tính phần trăm = totalAmount * 100 / targetAmount
         // BigDecimal currentAmount = totalAmount
-        //         .multiply(BigDecimal.valueOf(100)); // nhân 100
+        // .multiply(BigDecimal.valueOf(100)); // nhân 100
         return totalAmount;// convert BigDecimal -> Integer
     }
 
@@ -83,10 +97,20 @@ public class CampaignSummaryMapper {
         dto.setCampaignId(campaign.getId());
         dto.setTitle(campaign.getTitle());
         dto.setTargetAmount(campaign.getTargetAmount());
-        dto.setFeaturedImage(fileStorageProperties.getBaseUrl() + campaign.getFeaturedImage());
+        var transformation = new Transformation<>()
+                .width(800)
+                .crop("scale")
+                .quality("auto")
+                .fetchFormat("auto");
+        String eagerUrl = cloudinary.url()
+                .transformation(transformation)
+                .generate(campaign.getFeaturedImage());
+        dto.setFeaturedImage(eagerUrl);
+        // dto.setFeaturedImage(fileStorageProperties.getBaseUrl() +
+        // campaign.getFeaturedImage());
         dto.setSupportCount(campaign.getDonations().size());
         dto.setPercentage(calculatePercentage(campaign));
-        LocalDate startDate = LocalDate.now(); 
+        LocalDate startDate = LocalDate.now();
         LocalDate endDate = campaign.getEndDate();
         long totalDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
         dto.setDayLeft(totalDaysBetween);
@@ -95,13 +119,20 @@ public class CampaignSummaryMapper {
 
     public CampaignSummaryDTO toDTOWithImage(Campaign campaign) {
         CampaignSummaryDTO dto = toDTOBasic(campaign);
-
+        var transformation = new Transformation<>()
+                .width(800)
+                .crop("scale")
+                .quality("auto")
+                .fetchFormat("auto");
         // Map List<CampaignImage> sang List<CampaignImageDTO>
         if (campaign.getImages() != null) {
             List<CampaignImageDTO> imageDTOs = campaign.getImages().stream()
                     .map(campaignImage -> new CampaignImageDTO(
                             campaignImage.getId(),
-                            fileStorageProperties.getBaseUrl() + campaignImage.getImageUrl(),
+                            campaignImage.getImageUrl(),
+                            cloudinary.url()
+                                    .transformation(transformation)
+                                    .generate(campaignImage.getImageUrl()),
                             campaignImage.getSortOrder()))
                     .toList();
             dto.setCampaignImages(imageDTOs);

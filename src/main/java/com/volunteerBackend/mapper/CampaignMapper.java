@@ -5,21 +5,22 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.volunteerBackend.DTO.CampaignDTO;
 import com.volunteerBackend.DTO.CampaignImageDTO;
-import com.volunteerBackend.config.FileStorageProperties;
 import com.volunteerBackend.model.Campaign;
 
 @Component
 public class CampaignMapper {
     private final OrganizerMapper organizerMapper;
     private final CategoryMapper categoryMapper;
-    private final FileStorageProperties fileStorageProperties;
+    private final Cloudinary cloudinary;
     public CampaignMapper(OrganizerMapper organizerMapper, CategoryMapper categoryMapper,
-            CampaignImageMapper CampaignImageMapper, FileStorageProperties fileStorageProperties) {
+            CampaignImageMapper CampaignImageMapper, Cloudinary cloudinary) {
         this.organizerMapper = organizerMapper;
         this.categoryMapper = categoryMapper;
-        this.fileStorageProperties = fileStorageProperties;
+        this.cloudinary = cloudinary;
     }
 
     public CampaignDTO toDTOBasic(Campaign campaign) {
@@ -27,7 +28,16 @@ public class CampaignMapper {
         dto.setCampaignId(campaign.getId());
         dto.setTitle(campaign.getTitle());
         dto.setTargetAmount(campaign.getTargetAmount());
-        dto.setFeaturedImage(fileStorageProperties.getBaseUrl() + campaign.getFeaturedImage());
+        var transformation = new Transformation<>()
+                    .width(800)
+                    .crop("scale")
+                    .quality("auto")
+                    .fetchFormat("auto");
+            String eagerUrl = cloudinary.url()
+                    .transformation(transformation)
+                    .generate(campaign.getFeaturedImage());
+        dto.setFeaturedImage(eagerUrl);
+        // dto.setFeaturedImage(fileStorageProperties.getBaseUrl() + campaign.getFeaturedImage());
         dto.setStatus(campaign.getStatus());
         dto.setStartDate(campaign.getStartDate());
         dto.setEndDate(campaign.getEndDate());
@@ -42,7 +52,16 @@ public class CampaignMapper {
         dto.setCampaignId(campaign.getId());
         dto.setTitle(campaign.getTitle());
         dto.setTargetAmount(campaign.getTargetAmount());
-        dto.setFeaturedImage(fileStorageProperties.getBaseUrl() + campaign.getFeaturedImage());
+        var transformation = new Transformation<>()
+                    .width(800)
+                    .crop("scale")
+                    .quality("auto")
+                    .fetchFormat("auto");
+            String eagerUrl = cloudinary.url()
+                    .transformation(transformation)
+                    .generate(campaign.getFeaturedImage());
+        dto.setFeaturedImage(eagerUrl);
+        // dto.setFeaturedImage(fileStorageProperties.getBaseUrl() + campaign.getFeaturedImage());
         dto.setStatus(campaign.getStatus());
         dto.setStartDate(campaign.getStartDate());
         dto.setEndDate(campaign.getEndDate());
@@ -56,12 +75,20 @@ public class CampaignMapper {
     public CampaignDTO toDTOWithImage(Campaign campaign) {
         CampaignDTO dto = toDTOBasic(campaign);
 
+        var transformation = new Transformation<>()
+                    .width(800)
+                    .crop("scale")
+                    .quality("auto")
+                    .fetchFormat("auto");
         // Map List<CampaignImage> sang List<CampaignImageDTO>
         if (campaign.getImages() != null) {
             List<CampaignImageDTO> imageDTOs = campaign.getImages().stream()
                     .map(campaignImage -> new CampaignImageDTO(
                             campaignImage.getId(),
                             campaignImage.getImageUrl(),
+                            cloudinary.url()
+                                    .transformation(transformation)
+                                    .generate(campaignImage.getImageUrl()),
                             campaignImage.getSortOrder()))
                     .toList();
             dto.setCampaignImages(imageDTOs);

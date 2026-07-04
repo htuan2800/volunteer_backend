@@ -2,6 +2,8 @@ package com.volunteerBackend.request;
 
 import java.math.BigDecimal;
 
+import com.volunteerBackend.type.PaymentMethod;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +19,5 @@ public class DonateRequest {
     private String donor_name;
     private String donor_phone;
     private String message;
+    private PaymentMethod paymentMethod;
 }

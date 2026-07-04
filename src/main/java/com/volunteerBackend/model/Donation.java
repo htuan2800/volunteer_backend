@@ -60,25 +60,36 @@ public class Donation {
     @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
 
-    // Mã đơn hàng bạn sinh ra (vnp_TxnRef)
-    @Column(name = "vnp_txn_ref", unique = true)
-    private String vnpTxnRef;
+    /**
+     * - VNPAY: là vnp_TxnRef
+     * - MOMO: là orderId
+     */
+    @Column(name = "order_id", unique = true, nullable = false)
+    private String orderId;
 
-    // Mã giao dịch VNPay sinh ra (vnp_TransactionNo)
-    @Column(name = "vnp_transaction_no")
-    private String vnpTransactionNo;
+    /**
+     * - VNPAY: là vnp_TransactionNo
+     * - MOMO: là transId
+     */
+    @Column(name = "transaction_id")
+    private String TransactionId;
 
-    // Mã giao dịch ngân hàng (vnp_BankTranNo)
-    @Column(name = "vnp_bank_tran_no")
-    private String vnpBankTranNo;
+    @Column(name = "bank_code")
+    private String bankCode;
+    /**
+     * Mã phản hồi từ cổng.
+     * - VNPAY: vnp_ResponseCode (00)
+     * - MOMO: resultCode (0)
+     */
+    @Column(name = "response_code")
+    private String responseCode;
 
-    // Mã ngân hàng (vnp_BankCode)
-    @Column(name = "vnp_bank_code")
-    private String vnpBankCode;
-
-    // Mã phản hồi (vnp_ResponseCode)
-    @Column(name = "vnp_response_code")
-    private String vnpResponseCode;
+    /**
+     * - VNPAY: lưu vnp_BankTranNo, vnp_CardType, vnp_SecureHash...
+     * - MOMO: lưu requestId, payType, extraData...
+     */
+    @Column(name = "payment_details", columnDefinition = "TEXT")
+    private String paymentDetails;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")

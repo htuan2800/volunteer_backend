@@ -2,7 +2,7 @@ package com.volunteerBackend.Handler;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
-     @Autowired
+     
     private UserRepository userRepository;
 
     @Override
@@ -35,11 +35,21 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found after OAuth2 login"));
 
+        if(user.getIsDeleted()){
+             String redirectUrl = "http://localhost:5175/oauth2/redirect?token=deleted";
+            response.sendRedirect(redirectUrl);
+            return;
+        } else if(!user.getIsActive()){
+             String redirectUrl = "http://localhost:5175/oauth2/redirect?token=active";
+            response.sendRedirect(redirectUrl);
+            return;
+        } 
+
         // Tạo Access Token
-        String accessToken = JwtProvider.generateToken(authentication, user);
+        String accessToken = JwtProvider.generateToken(user);
 
         // Tạo Refresh Token
-        String refreshToken = JwtProvider.generateRefreshToken(authentication, user);
+        String refreshToken = JwtProvider.generateRefreshToken(user);
 
         // Set refreshToken vào HttpOnly cookie
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)

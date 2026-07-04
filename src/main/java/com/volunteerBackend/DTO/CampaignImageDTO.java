@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CampaignImageDTO {
     public Long id;
+    public String publicId;
     public String url;
     public Integer sortOrder;
 }

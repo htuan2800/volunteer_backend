@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.volunteerBackend.DTO.ChatDTO;
@@ -19,9 +19,9 @@ import com.volunteerBackend.mapper.ChatMapper;
 @Service
 public class ChatServiceImplementation implements ChatService {
 
-    @Autowired
+    
     private ChatRepository chatRepository;
-    @Autowired
+    
     private ChatMapper chatMapper;
 
     @Override

@@ -17,8 +17,10 @@ public class UserDTO {
     private String email;
     private Gender gender;
     private String avatar;
+    private String publicIDAvatar;
     private String phoneNumber;
     private String coverPhotoURL;
+    private String publicIDCoverPhoto;
     private UserRole role;
     private LocalDateTime createdAt;
     private Boolean isVerified;   

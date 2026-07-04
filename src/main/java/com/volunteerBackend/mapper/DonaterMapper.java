@@ -17,7 +17,7 @@ public class DonaterMapper {
         dto.setMessage(donation.getMessage());
         dto.setIsAnonymous(donation.getIsAnonymous());
         dto.setPaymentMethod(donation.getPaymentMethod());
-        dto.setVnpTransactionNo(donation.getVnpTransactionNo());
+        dto.setTransactionNo(donation.getTransactionId());
         dto.setPaymentStatus(donation.getPaymentStatus());
         dto.setCreatedAt(donation.getCreatedAt());
         dto.setPaymentDate(donation.getPaymentDate());

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.volunteerBackend.service.CloudinaryStorageService;
 import com.volunteerBackend.service.FileStorageService;
 import com.volunteerBackend.type.FileType;
 
@@ -30,27 +31,45 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/api/files")
 public class FileController {
 
-    @Autowired
+    
     private FileStorageService fileStorageService;
 
+
+    
+    private CloudinaryStorageService cloudinaryStorageService;
+
     // Upload với FileType
+    // @PostMapping("/upload")
+    // public ResponseEntity<Map<String, String>> uploadFile(
+    //         @RequestParam("file") MultipartFile file,
+    //         @RequestParam("type") String type) {
+        
+    //     FileType fileType = FileType.valueOf(type.toUpperCase());
+    //     String filePath = fileStorageService.storeFile(file, fileType);
+        
+    //     String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+    //             .path("/uploads/")
+    //             .path(filePath)
+    //             .toUriString();
+
+    //     Map<String, String> response = new HashMap<>();
+    //     response.put("filePath", filePath); // "campaign/uuid.jpg"
+    //     response.put("fileUrl", fileDownloadUri);
+    //     response.put("fileType", file.getContentType());
+
+    //     return ResponseEntity.ok(response);
+    // }
+
     @PostMapping("/upload")
     public ResponseEntity<Map<String, String>> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("type") String type) {
         
         FileType fileType = FileType.valueOf(type.toUpperCase());
-        String filePath = fileStorageService.storeFile(file, fileType);
-        
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/uploads/")
-                .path(filePath)
-                .toUriString();
+        String filePath = cloudinaryStorageService.storeFile(file, fileType);
 
         Map<String, String> response = new HashMap<>();
         response.put("filePath", filePath); // "campaign/uuid.jpg"
-        response.put("fileUrl", fileDownloadUri);
-        response.put("fileType", file.getContentType());
 
         return ResponseEntity.ok(response);
     }
@@ -61,15 +80,10 @@ public class FileController {
             @RequestParam("type") String type) {
         
         FileType fileType = FileType.valueOf(type.toUpperCase());
-        List<String> filePaths = fileStorageService.storeMultipleFiles(files, fileType);
+        List<String> filePaths = cloudinaryStorageService.storeMultipleFiles(files, fileType);
         
         List<Map<String, String>> fileInfos = new ArrayList<>();
         for (String filePath : filePaths) {
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/uploads/")
-                    .path(filePath)
-                    .toUriString();
-            
             Map<String, String> fileInfo = new HashMap<>();
             fileInfo.put("url", filePath);
             fileInfos.add(fileInfo);

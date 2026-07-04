@@ -3,7 +3,7 @@ package com.volunteerBackend.service;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -22,7 +22,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class CustomOidcUserService extends OidcUserService {
-    @Autowired
+    
     private UserRepository userRepository;
 
     public CustomOidcUserService() {

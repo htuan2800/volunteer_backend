@@ -4,26 +4,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.volunteerBackend.DTO.ChatDTO;
-import com.volunteerBackend.config.FileStorageProperties;
 import com.volunteerBackend.model.Chat;
 import com.volunteerBackend.model.Message;
-import com.volunteerBackend.type.AuthProvider;
 import com.volunteerBackend.type.ChatType;
 
 @Component
 public class ChatMapper {
 
-    private final FileStorageProperties fileStorageProperties;
+    private final Cloudinary cloudinary;
 
-    public ChatMapper(FileStorageProperties fileStorageProperties) {
-        this.fileStorageProperties = fileStorageProperties;
+    public ChatMapper(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
     }
 
-    @Autowired
+    
     private MessageMapper messageMapper;
 
     public ChatDTO toDTO(Chat chat) {
@@ -40,7 +40,15 @@ public class ChatMapper {
             if (chat.getUser().getAvatar().startsWith("http") || chat.getUser().getAvatar().startsWith("https")) {
                 dto.setChatImage(chat.getUser().getAvatar());
             } else {
-                dto.setChatImage(fileStorageProperties.getBaseUrl() + chat.getUser().getAvatar());
+                var transformation = new Transformation<>()
+                        .width(800)
+                        .crop("scale")
+                        .quality("auto")
+                        .fetchFormat("auto");
+                String eagerUrl = cloudinary.url()
+                        .transformation(transformation)
+                        .generate(chat.getUser().getAvatar());
+                dto.setChatImage(eagerUrl);
             }
             dto.setCreatedAt(chat.getCreatedAt());
             List<Message> messages = chat.getMessages();

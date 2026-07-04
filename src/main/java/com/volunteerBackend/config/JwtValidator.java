@@ -28,6 +28,7 @@ public class JwtValidator extends OncePerRequestFilter {
                 // Validate token first
                 if (JwtProvider.validateToken(jwt)) {
                     String email = JwtProvider.getEmailFromJwtToken(jwt);
+                    System.out.println("JWT validation successful for email: " + email);
                     List<GrantedAuthority> authorities = Collections.singletonList(
                             new SimpleGrantedAuthority("ROLE_" + role));
                     Authentication authentication = new UsernamePasswordAuthenticationToken(

@@ -1,7 +1,7 @@
 package com.volunteerBackend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,19 +38,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api")
 public class UserController {
-    @Autowired
+    
     UserRepository userRepository;
 
-    @Autowired
+    
     UserService userService;
 
-    @Autowired
+    
     CampaignService campaignService;
 
-    @Autowired
+    
     private CampaignSummaryMapper campaignSummaryMapper;
 
-    @Autowired
+    
     private UserMapper userMapper;
 
     @GetMapping("/users/{userId}")
@@ -78,17 +78,17 @@ public class UserController {
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/users/dashboard")
-    public ResponseEntity<InfoResponse<DashboardOfUserDTO>> getDashboardOfUser(@AuthenticationPrincipal String email) throws UserException {
-        User user = userService.findUserByEmail(email);
+    @GetMapping("/users/dashboard/{userId}")
+    public ResponseEntity<InfoResponse<DashboardOfUserDTO>> getDashboardOfUser(@PathVariable Integer userId) throws UserException {
+        User user = userService.findUserById(userId);
         DashboardOfUserDTO dashboard = userService.getDashboardOfUser(user);
         InfoResponse<DashboardOfUserDTO> dashboardResponse = new InfoResponse<>(true, "Dashboard found", dashboard);
         return new ResponseEntity<>(dashboardResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/users/dashboard/campaigns")
-    public ResponseEntity<List<CampaignSummaryDTO>> getDashboardCampaignsOfUser(@AuthenticationPrincipal String email) throws UserException {
-        User user = userService.findUserByEmail(email);
+    @GetMapping("/users/dashboard/campaigns/{userId}")
+    public ResponseEntity<List<CampaignSummaryDTO>> getDashboardCampaignsOfUser(@PathVariable Integer userId) throws UserException {
+        User user = userService.findUserById(userId);
         List<Campaign> campaigns = campaignService.getCampaignsOfUser(user);
         List<CampaignSummaryDTO> campaignDTOs = campaignSummaryMapper.toDTOListBasicNotStoryInfo(campaigns);
         return new ResponseEntity<>(campaignDTOs, HttpStatus.OK);
@@ -100,7 +100,9 @@ public class UserController {
             @RequestBody UserRequest user) throws UserException {
         User existingUser = userService.findUserByEmail(email);
         boolean isSuccess = userService.updateUser(user, existingUser);
-        return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+        UserDTO UserDTO = userMapper.toDTO(existingUser);
+        InfoResponse<UserDTO> userResponse = new InfoResponse<>(isSuccess, "User found", UserDTO);
+        return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
     @GetMapping("/admin/users")

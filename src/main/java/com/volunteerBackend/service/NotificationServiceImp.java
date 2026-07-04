@@ -3,7 +3,7 @@ package com.volunteerBackend.service;
 import java.util.List;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.volunteerBackend.DTO.NotificationDTO;
@@ -17,16 +17,16 @@ import com.volunteerBackend.request.NotificationRequest;
 
 @Service
 public class NotificationServiceImp implements NotificationService {
-    @Autowired
+    
     private NotificationRepository notificationRepository;
 
-    @Autowired
+    
     private UserRepository userRepository;
 
-    @Autowired
+    
     private RabbitTemplate rabbitTemplate;
 
-    @Autowired
+    
     private NotificationMapper notificationMapper;
     
     @Override

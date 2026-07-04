@@ -9,21 +9,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.volunteerBackend.model.Campaign;
 import com.volunteerBackend.repository.CampaignRepository;
+import com.volunteerBackend.type.CampaignStatus;
 
-import jakarta.annotation.PostConstruct;
 import redis.clients.jedis.exceptions.JedisDataException;
 
 @Service
@@ -31,7 +29,7 @@ public class SchemaVectorService {
 
     private final VectorStore vectorStore;
     private final RedisTemplate<String, Object> redisTemplate;
-    @Autowired
+    
     private CampaignRepository campaignRepository;
 
     @Value("${spring.ai.vectorstore.redis.index-name}")
@@ -87,7 +85,8 @@ public class SchemaVectorService {
 
         for (String chunk : chunks) {
             String trimmedChunk = chunk.trim();
-            if (trimmedChunk.isEmpty()) continue;
+            if (trimmedChunk.isEmpty())
+                continue;
 
             Map<String, Object> metadata = new HashMap<>();
             metadata.put("source", sourceType); // Quan trọng: biết nó từ file nào
@@ -104,59 +103,50 @@ public class SchemaVectorService {
     private List<Document> loadCampaignsFromDatabase() {
         System.out.println("Loading campaigns from database...");
         List<Document> documents = new ArrayList<>();
-        List<Campaign> campaigns = campaignRepository.findAll(); // Lấy tất cả
+        List<Campaign> campaigns = campaignRepository.findAllWithDetails(); // Lấy tất cả
 
         for (Campaign campaign : campaigns) {
-            // Ghép các trường text ý nghĩa lại
-            String content = "Tên chiến dịch: " + campaign.getTitle() + "\n" +
-                             "Mô tả: " + campaign.getStoryInfo() + "\n" +
-                             "Mục tiêu: " + campaign.getTargetAmount();
+            String statusText = "";
+            if (campaign.getStatus() == CampaignStatus.ENDED) {
+                statusText = "TRẠNG THÁI: Đã kết thúc.\n";
+            } else if (campaign.getStatus() == CampaignStatus.IN_PROGRESS) {
+                statusText = "TRẠNG THÁI: Đang kêu gọi quyên góp.\n";
+            } else if (campaign.getStatus() == CampaignStatus.PAUSED) {
+                statusText = "TRẠNG THÁI: Đã tạm dừng.\n";
+            } else if (campaign.getStatus() == CampaignStatus.TARGET_REACHED) {
+                statusText = "TRẠNG THÁI: Đã đạt mục tiêu (kết thúc thành công).\n";
+            }
+            String titleContent = statusText +
+                                "Tên chiến dịch: " + campaign.getTitle() + "\n" +
+                                "Mục tiêu: " + campaign.getTargetAmount() + "\n" +
+                                "Danh mục: " + campaign.getCategory().getName() + "\n" +
+                                "Tổ chức: " + campaign.getOrganizer().getName();
 
-            Map<String, Object> metadata = new HashMap<>();
-            metadata.put("source", "database_campaign");
-            metadata.put("campaign_id", campaign.getId()); // Cực kỳ quan trọng
-            metadata.put("campaign_title", campaign.getTitle());
+            Map<String, Object> metadata1 = new HashMap<>();
+            metadata1.put("source", "db_campaign_title");
+            metadata1.put("campaign_id", campaign.getId());
+            metadata1.put("campaign_title", campaign.getTitle());
 
-            documents.add(new Document(content, metadata));
+            String docId1 = "campaign_" + campaign.getId() + "_title";
+            documents.add(new Document(docId1, titleContent, metadata1));
+
+            String storyContent = statusText +
+                            "Mô tả chi tiết chiến dịch " + campaign.getTitle() + ": \n" +
+                            campaign.getStoryInfo();
+
+            Map<String, Object> metadata2 = new HashMap<>();
+            metadata2.put("source", "db_campaign_story");
+            metadata2.put("campaign_id", campaign.getId());
+            metadata2.put("campaign_title", campaign.getTitle());
+
+            String docId2 = "campaign_" + campaign.getId() + "_story";
+            documents.add(new Document(docId2, storyContent, metadata2));
+
         }
         System.out.println("Loaded " + documents.size() + " campaigns from database.");
         return documents;
     }
 
-    // private String generateTableDescription(String tableName, String schema) {
-    //     // Đây là ví dụ đơn giản, bạn nên làm chi tiết hơn
-    //     if ("categories".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này chứa thông tin về các danh mục chiến dịch từ thiện.";
-    //     }
-    //     if ("campaigns".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này chứa thông tin chính về các chiến dịch từ thiện";
-    //     }
-    //     if ("campaign_images".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này chứa thông tin hình ảnh liên quan đến các chiến dịch từ thiện.";
-    //     }
-    //     if ("donations".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này lưu lại lịch sử các lần quyên góp (donations) cho mỗi chiến dịch";
-    //     }
-    //     if ("dashboard_statistics".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này dùng để lưu trữ các số liệu thống kê tổng hợp cho dashboard.";
-    //     }
-    //     if ("users".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này chứa thông tin người dùng đăng ký trên hệ thống.";
-    //     }
-    //     if ("organizers".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này chứa thông tin các tổ chức trên hệ thống.";
-    //     }
-    //     if ("messages".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này chứa các tin nhắn giữa người dùng và admin hoặc admin và AI.";
-    //     }
-    //     if ("chat".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này chứa các phiên chat giữa ADMIN và AI hoặc người dùng và ADMIN.";
-    //     }
-    //     if ("user_providers".equalsIgnoreCase(tableName)) {
-    //         return "Bảng này chứa các kiểu đăng nhập của người dùng (Google, Facebook, v.v.).";
-    //     }
-    //     return "Một bảng trong cơ sở dữ liệu.";
-    // }
     /**
      * Tìm kiếm schema liên quan dựa trên user query
      */
@@ -166,6 +156,7 @@ public class SchemaVectorService {
                 SearchRequest.builder()
                         .query(userQuery)
                         .topK(topK)
+                        .similarityThreshold(0.5)
                         .build());
 
         // Ghép các schema chunks lại
@@ -174,15 +165,6 @@ public class SchemaVectorService {
             relevantSchema.append(doc.getText()).append("\n\n");
         }
         return relevantSchema.toString();
-    }
-
-    /**
-     * Trích xuất tên table từ schema
-     */
-    private String extractTableName(String tableSchema) {
-        Pattern pattern = Pattern.compile("CREATE TABLE\\s+`?(\\w+)`?", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(tableSchema);
-        return matcher.find() ? matcher.group(1) : "unknown";
     }
 
     /**
@@ -224,4 +206,5 @@ public class SchemaVectorService {
 
         System.out.println("--- [SCHEMA RE-INDEXING] Hoàn thành ---");
     }
+
 }

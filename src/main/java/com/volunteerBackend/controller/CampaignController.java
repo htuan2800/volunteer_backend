@@ -3,7 +3,7 @@ package com.volunteerBackend.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,16 +29,16 @@ import com.volunteerBackend.mapper.CampaignSummaryMapper;
 @RestController
 @RequestMapping("/api")
 public class CampaignController {
-    @Autowired
+    
     private CampaignService campaignService;
 
-    @Autowired
+    
     private OrganizerService organizerService;
 
-    @Autowired
+    
     private CampaignMapper campaignMapper;
 
-    @Autowired
+    
     private CampaignSummaryMapper campaignSummaryMapper;
 
     // Dành cho All
@@ -70,16 +69,14 @@ public class CampaignController {
 
     // Dành cho Admin
     @GetMapping("/admin/campaigns")
-    public ResponseEntity<List<CampaignDTO>> getCampaignsByAdmin(
-            @RequestHeader(value = "Authorization", required = false) String jwt) {
+    public ResponseEntity<List<CampaignDTO>> getCampaignsByAdmin() {
         List<Campaign> campaigns = campaignService.getAllCampaigns();
         List<CampaignDTO> categoryDTOs = campaignMapper.toDTOListBasicNotStoryInfo(campaigns);
         return new ResponseEntity<>(categoryDTOs, HttpStatus.OK);
     }
 
-    @GetMapping("/campaigns/search")
+    @GetMapping("/admin/campaigns/search")
     public ResponseEntity<List<CampaignDTO>> getSearchCampaigns(
-            @RequestHeader(value = "Authorization", required = false) String jwt,
             @RequestParam(required = false) String keyword
         ) 
     {

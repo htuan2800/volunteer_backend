@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -29,9 +30,13 @@ import com.volunteerBackend.request.MessageRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
+@Slf4j
 public class MessageServiceImplementation implements MessageService {
     private static final String SCHEMA_FILE = "src/main/resources/db_schema.txt";
 
@@ -108,9 +113,11 @@ public class MessageServiceImplementation implements MessageService {
 
             // 2. Lưu tin nhắn của user
             MessageDTO userMessage = createMessage(req);
-            messagingTemplate.convertAndSend("/topic/chat/" + sessionId, Map.of(
-                        "type", "USER_MESSAGE",
-                        "message", userMessage));
+            Object payload = Map.of(
+                "type", "USER_MESSAGE",
+                "message", userMessage
+            );
+            messagingTemplate.convertAndSend("/topic/chat/" + sessionId, payload);
 
             // 3. Xử lý AI query và gửi response
             if (req.getType().equals("AI_WITH_ADMIN")) {
@@ -152,7 +159,7 @@ public class MessageServiceImplementation implements MessageService {
         try {
             String schema = loadDatabaseSchema();
             String generatedSql = generateSqlQuery(userQuery, schema);
-
+            System.out.println("Generated SQL: " + generatedSql);
             if ("NOT_DB_QUERY".equals(generatedSql)) {
                 handleGeneralChat(userQuery, sessionId, chat);
             } else {
@@ -163,9 +170,9 @@ public class MessageServiceImplementation implements MessageService {
         }
     }
 
-     public void processAndRespondOfAIWithUSER(String userQuery, String sessionId, Chat chat) throws IOException {
+    public void processAndRespondOfAIWithUSER(String userQuery, String sessionId, Chat chat) throws IOException {
         try {
-            String relevantSchema = schemaVectorService.findRelevantSchema(userQuery, 3);
+            String relevantSchema = schemaVectorService.findRelevantSchema(userQuery, 5);
             generateResponseFromDataOfAIWithUser(relevantSchema, userQuery, sessionId, chat);
 
         } catch (Exception e) {
@@ -202,8 +209,6 @@ public class MessageServiceImplementation implements MessageService {
 
         return cleanAIResponse(fullGeneratedSql);
     }
-
-
 
     /**
      * Xử lý chat thông thường (không liên quan DB)
@@ -267,11 +272,12 @@ public class MessageServiceImplementation implements MessageService {
     private void generateResponseFromDataOfAIWithUser(String results, String userQuery,
             String sessionId, Chat chat) {
 
+        System.out.println("results: " + results);
         PromptTemplate responsePromptTemplate = new PromptTemplate(
                 "Bạn là trợ lý AI cho trang web từ thiện. Dựa trên dữ liệu sau:\n{data}\n" +
                         "Câu hỏi người dùng: {user_query}\n" +
                         "Trả lời bằng tiếng Việt, ngắn gọn, tự nhiên như đang trò chuyện. " +
-                        "Nếu có số liệu, giải thích đơn giản. Không đề cập đến SQL hoặc dữ liệu thô.");
+                        "Nếu có số liệu, giải thích đơn giản.");
 
         String responsePrompt = responsePromptTemplate.render(Map.of(
                 "data", results,
@@ -290,37 +296,78 @@ public class MessageServiceImplementation implements MessageService {
         String messageId = UUID.randomUUID().toString(); // Tạo ID cho message stream
 
         // Gửi signal bắt đầu streaming
+        Object streamStartPayload = Map.of(
+            "type", "STREAM_START", 
+            "messageId", messageId
+        );
         messagingTemplate.convertAndSend("/topic/chat/" + sessionId,
-                Map.of("type", "STREAM_START", "messageId", messageId));
+                streamStartPayload);
 
-        responseFlux.subscribe(
-                response -> {
-                    String chunk = response.getResult().getOutput().getText();
-                    fullResponse.append(chunk);
+        responseFlux
+                .doOnNext(response -> {
+                    // --- FIX 1: Thêm kiểm tra null an toàn ---
+                    String chunk = Optional.ofNullable(response)
+                            .map(ChatResponse::getResult)
+                            .map(result -> result.getOutput()) // Giả sử getOutput() không null
+                            .map(output -> output.getText()) // Giả sử getText() không null
+                            .orElse(""); // Nếu bất kỳ đâu là null, dùng chuỗi rỗng
 
-                    // GỬI TỪNG CHUNK
+                    if (!chunk.isEmpty()) {
+                        fullResponse.append(chunk);
+                        // GỬI TỪNG CHUNK
+                        Object chunkPayload = Map.of(
+                            "type", "STREAM_CHUNK",
+                            "messageId", messageId,
+                            "chunk", chunk
+                        );
+                        messagingTemplate.convertAndSend("/topic/chat/" + sessionId,
+                                chunkPayload);
+                    }
+                })
+                .doOnError(error -> {
+                    // GỬI LỖI
+                    Object errorPayload = Map.of(
+                        "type", "STREAM_ERROR",
+                        "messageId", messageId,
+                        "error", error.getMessage()
+                    );
                     messagingTemplate.convertAndSend("/topic/chat/" + sessionId,
-                            Map.of(
-                                    "type", "STREAM_CHUNK",
-                                    "messageId", messageId,
-                                    "chunk", chunk));
-                },
-                error -> {
-                    messagingTemplate.convertAndSend("/topic/chat/" + sessionId,
-                            Map.of("type", "STREAM_ERROR", "messageId", messageId,
-                                    "error", error.getMessage()));
-                },
-                () -> {
-                    // Khi hoàn thành, lưu vào DB và gửi signal kết thúc
-                    String completeMessage = cleanThinkingTags(fullResponse.toString());
-                    MessageDTO savedMessage = saveAiMessage(chat, completeMessage, MessageType.ASSISTANT);
+                            errorPayload);
+                })
+                .doOnComplete(() -> {
+                    // (Không làm gì ở đây, chúng ta sẽ xử lý sau khi stream kết thúc)
+                })
+                .then(
+                        // --- FIX 2: Xử lý blocking I/O (lưu DB) sau khi stream hoàn thành ---
+                        Mono.fromRunnable(() -> {
+                            // Tác vụ này sẽ chạy trên một thread khác (boundedElastic)
+                            String completeMessage = cleanThinkingTags(fullResponse.toString());
+                            MessageDTO savedMessage = saveAiMessage(chat, completeMessage, MessageType.ASSISTANT);
 
+                            // Gửi STREAM_END chỉ sau khi đã LƯU THÀNH CÔNG
+                            Object streamEndPayload = Map.of(
+                                "type", "STREAM_END",
+                                "messageId", messageId,
+                                "message", savedMessage
+                            );
+                            messagingTemplate.convertAndSend("/topic/chat/" + sessionId,
+                                    streamEndPayload);
+
+                        })
+                                // Yêu cầu Reactor chạy tác vụ blocking (saveAiMessage) trên 1 thread pool riêng
+                                .subscribeOn(Schedulers.boundedElastic()))
+                // Bắt lỗi nếu ngay cả việc LƯU DB cũng thất bại
+                .doOnError(saveError -> {
+                    log.error("Lỗi nghiêm trọng khi lưu message vào DB: {}", saveError.getMessage());
+                    Object streamErrorPayload = Map.of(
+                        "type", "STREAM_ERROR",
+                        "messageId", messageId,
+                        "error", "Lỗi máy chủ khi lưu tin nhắn."
+                    );
                     messagingTemplate.convertAndSend("/topic/chat/" + sessionId,
-                            Map.of(
-                                    "type", "STREAM_END",
-                                    "messageId", messageId,
-                                    "message", savedMessage));
-                });
+                            streamErrorPayload);
+                })
+                .subscribe(); // Kích hoạt toàn bộ chain
     }
 
     /**

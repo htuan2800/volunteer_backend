@@ -1,8 +1,6 @@
 package com.volunteerBackend.config;
 
 import javax.crypto.SecretKey;
-import org.springframework.security.core.Authentication;
-
 import com.volunteerBackend.model.User;
 
 import io.jsonwebtoken.Claims;
@@ -20,7 +18,7 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String generateToken(Authentication auth, User user) {
+    public static String generateToken( User user) {
         Instant now = Instant.now();
         Date issuedAt = Date.from(now);
         Date expiration = Date.from(now.plusSeconds(3600)); // 1h
@@ -29,7 +27,7 @@ public class JwtProvider {
                 .issuer("volunteer")
                 .issuedAt(issuedAt)
                 .expiration(expiration)
-                .claim("email", auth.getName())
+                .claim("email", user.getEmail())
                 .claim("id", user.getId())
                 .claim("type", "access")
                 .claim("role", user.getRole())
@@ -54,7 +52,7 @@ public class JwtProvider {
                 .compact();
     }
 
-    public static String generateRefreshToken(Authentication auth, User user) {
+    public static String generateRefreshToken( User user) {
         Instant now = Instant.now();
         Date issuedAt = Date.from(now);
         Date expiration = Date.from(now.plusSeconds(365L * 24 * 3600)); // 1 năm

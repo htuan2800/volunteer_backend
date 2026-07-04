@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +39,7 @@ public class VnPayService {
         this.vnPayConfig = vnPayConfig;
     }
 
-    public String createPaymentUrl(HttpServletRequest request, Long donationId, BigDecimal amount, String vnp_TxnRef)
+    public String createPaymentUrl(HttpServletRequest request, Long donationId, BigDecimal amount, String orderId)
             throws UnsupportedEncodingException {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -49,7 +50,7 @@ public class VnPayService {
         vnpParams.put("vnp_TmnCode", vnPayConfig.getTmnCode());
         vnpParams.put("vnp_Amount", amount.multiply(BigDecimal.valueOf(100)).toBigInteger().toString());
         vnpParams.put("vnp_CurrCode", "VND");
-        vnpParams.put("vnp_TxnRef", vnp_TxnRef);
+        vnpParams.put("vnp_TxnRef", orderId);
         vnpParams.put("vnp_OrderInfo", "Thanh toan don hang:" + donationId);
         vnpParams.put("vnp_OrderType", "other");
         vnpParams.put("vnp_Locale", "vn");
@@ -61,11 +62,9 @@ public class VnPayService {
         String expirationDate = dateFormat.format(calendar.getTime());
         vnpParams.put("vnp_ExpireDate", expirationDate);
 
-        // 2️⃣ Sort key theo thứ tự tăng dần
         List<String> sortedFieldNames = new ArrayList<>(vnpParams.keySet());
         Collections.sort(sortedFieldNames);
 
-        // 3️⃣ Tạo chuỗi hashData và query string
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
 
@@ -86,12 +85,11 @@ public class VnPayService {
         }
 
         System.out.println("Hash data: " + vnPayConfig.getHashSecret());
-        // 4️⃣ Tạo chữ ký HMAC SHA512
         String vnp_SecureHash = VnpayUtil.hmacSHA512(vnPayConfig.getHashSecret(), hashData.toString());
 
         query.append("&vnp_SecureHash=").append(vnp_SecureHash);
 
-        // 6️⃣ Trả về URL thanh toán
+        System.out.println("Redirect to: " + vnPayConfig.getPayUrl() + "?" + query.toString());
         return vnPayConfig.getPayUrl() + "?" + query.toString();
     }
 
@@ -135,7 +133,7 @@ public class VnPayService {
             json.addProperty("vnp_SecureHash", vnp_SecureHash);
 
             // --- Gửi POST request tới VNPay
-            URL url = new URL(vnPayConfig.getApiUrl());
+            URL url = new URI(vnPayConfig.getApiUrl()).toURL();
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");

@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,32 +37,15 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class UserServiceImp implements UserService {
-
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
+    private CloudinaryStorageService cloudinaryStorageService;
     private DashboardStatisticsService dashboardStatisticsService;
-
-    @Autowired
     UserRepository userRepository;
 
     @Value("${app.verification.token-expiry}")
     private long tokenExpiryMs;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
     private RabbitTemplate rabbitTemplate;
-
-    @Autowired
     private DonationRepository donationRepository;
-
-    @Autowired
     private NotificationService notificationService;
 
     @Override
@@ -80,6 +62,12 @@ public class UserServiceImp implements UserService {
         user.setPhoneNumber(user.getPhoneNumber().trim());
         user.setGender(user.getGender());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        UserProvider userProvider = new UserProvider();
+        userProvider.setProviderName(AuthProvider.LOCAL);
+        userProvider.setUser(user);
+        user.getProviders().add(userProvider);
+
         userRepository.save(user);
         dashboardStatisticsService.updateTotalUsers();
         return true;
@@ -140,8 +128,8 @@ public class UserServiceImp implements UserService {
 
         UserProvider userProvider = new UserProvider();
         userProvider.setProviderName(AuthProvider.LOCAL);
-        newUser.getProviders().add(userProvider);
         userProvider.setUser(newUser);
+        newUser.getProviders().add(userProvider);
         User savedUser = userRepository.save(newUser);
         EmailVerifyPayload payload = new EmailVerifyPayload();
         payload.setToken(token);
@@ -208,9 +196,8 @@ public class UserServiceImp implements UserService {
         user.setVerificationToken(null);
         user.setTokenExpiry(null);
         boolean isAlreadyLinked = user.getProviders().stream()
-                .anyMatch(p -> p.getProviderName().equals(AuthProvider.GOOGLE) ||
-                        p.getProviderName().equals(AuthProvider.FACEBOOK));
-        if(isAlreadyLinked)
+                .anyMatch(p -> p.getProviderName().equals(AuthProvider.LOCAL));
+        if(!isAlreadyLinked)
         {
             UserProvider userProvider = new UserProvider();
             userProvider.setProviderName(AuthProvider.LOCAL);
@@ -233,14 +220,14 @@ public class UserServiceImp implements UserService {
         }
         if (user.getOption().equals("COVER_IMAGE")) {
             if (existingUser.getCoverPhotoURL() != null) {
-                fileStorageService.deleteFile(existingUser.getCoverPhotoURL());
+                cloudinaryStorageService.deleteFile(existingUser.getCoverPhotoURL());
             }
             existingUser.setCoverPhotoURL(user.getCoverPhotoURL());
         } else if (user.getOption().equals("AVATAR_IMAGE")) {
             if (existingUser.getAvatar() != null) {
                 if (existingUser.getAvatar().startsWith("http") || existingUser.getAvatar().startsWith("https")) {
                 } else {
-                    fileStorageService.deleteFile(existingUser.getAvatar());
+                    cloudinaryStorageService.deleteFile(existingUser.getAvatar());
                 }
             }
             existingUser.setAvatar(user.getAvatar());
@@ -250,6 +237,13 @@ public class UserServiceImp implements UserService {
             existingUser.setPhoneNumber(user.getPhoneNumber());
         }
         userRepository.save(existingUser);
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setUserId(existingUser.getId());
+        notificationRequest.setTitle("Thay đổi thông tin cá nhân");
+        notificationRequest.setMessage("Thông tin cá nhân của bạn đã được thay đổi vui lòng kiếm tra lại");
+        notificationRequest.setRelatedId(null);
+        notificationRequest.setType(NotificationType.SYSTEM);
+        notificationService.createNotification(notificationRequest);
         return true;
     }
 
@@ -265,13 +259,13 @@ public class UserServiceImp implements UserService {
         if (user.getOption().equals("IMAGE")) {
             if (StringUtils.hasText(user.getAvatar())) {
                 if (StringUtils.hasText(oldUser.getAvatar())) {
-                    fileStorageService.deleteFile(oldUser.getAvatar());
+                    cloudinaryStorageService.deleteFile(oldUser.getAvatar());
                 }
                 oldUser.setAvatar(user.getAvatar());
             }
             if (StringUtils.hasText(user.getCoverPhotoURL())) {
                 if (StringUtils.hasText(oldUser.getCoverPhotoURL())) {
-                    fileStorageService.deleteFile(oldUser.getCoverPhotoURL());
+                    cloudinaryStorageService.deleteFile(oldUser.getCoverPhotoURL());
                 }
                 oldUser.setCoverPhotoURL(user.getCoverPhotoURL());
             }

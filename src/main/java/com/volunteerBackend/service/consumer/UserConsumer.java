@@ -1,7 +1,7 @@
 package com.volunteerBackend.service.consumer;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 
 import com.volunteerBackend.config.RabbitMQConfig;
@@ -14,10 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class UserConsumer {
-    @Autowired
+    
     private EmailService emailService;
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_REGISTRATION_NAME)
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_REGISTRATION_NAME, containerFactory = "myFactory")
     public void handleRegistrationEmail(EmailVerifyPayload payload) {
         System.out.println("LOG: Received email request from RabbitMQ. Preparing to send to: " + payload);
         try {
@@ -32,7 +32,7 @@ public class UserConsumer {
         }
     }
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_FORGETPASSWORD_NAME)
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_FORGETPASSWORD_NAME, containerFactory = "myFactory")
     public void handleForgotPasswordEmail(EmailResetPayload payload) {
         System.out.println("LOG: Received email request from RabbitMQ. Preparing to send to: " + payload);
         try {

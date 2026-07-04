@@ -1,4 +1,4 @@
-CREATE TABLE `campaigns` (
+TABLE `campaigns` (
  `id` bigint NOT NULL AUTO_INCREMENT,
  `created_at` datetime(6) DEFAULT NULL,
  `end_date` date DEFAULT NULL,
@@ -17,9 +17,9 @@ CREATE TABLE `campaigns` (
  KEY `FKpa9jxmw7pgmpjsxwq07hg3ojv` (`organizer_id`),
  CONSTRAINT `FKaqf3w59x5i7ckbfwpf8i8hosu` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
  CONSTRAINT `FKpa9jxmw7pgmpjsxwq07hg3ojv` FOREIGN KEY (`organizer_id`) REFERENCES `organizers` (`organizer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `campaign_images` (
+TABLE `campaign_images` (
  `id` bigint NOT NULL AUTO_INCREMENT,
  `created_at` datetime(6) DEFAULT NULL,
  `image_url` varchar(255) NOT NULL,
@@ -28,9 +28,9 @@ CREATE TABLE `campaign_images` (
  PRIMARY KEY (`id`),
  KEY `FKo00u8uohcpshhasoc52yfw6qr` (`campaign_id`),
  CONSTRAINT `FKo00u8uohcpshhasoc52yfw6qr` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `categories` (
+TABLE `categories` (
  `id` bigint NOT NULL AUTO_INCREMENT,
  `created_at` datetime(6) DEFAULT NULL,
  `description` text,
@@ -39,9 +39,9 @@ CREATE TABLE `categories` (
  `name` varchar(255) NOT NULL,
  `slug` varchar(255) NOT NULL,
  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `chat` (
+TABLE `chat` (
  `id` int NOT NULL AUTO_INCREMENT,
  `chat_image` varchar(255) DEFAULT NULL,
  `chat_name` varchar(255) DEFAULT NULL,
@@ -52,9 +52,9 @@ CREATE TABLE `chat` (
  PRIMARY KEY (`id`),
  KEY `FK1x766u663l7m0mxuj0o72muu` (`user_id`),
  CONSTRAINT `FK1x766u663l7m0mxuj0o72muu` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `dashboard_statistics` (
+TABLE `dashboard_statistics` (
  `id` bigint NOT NULL AUTO_INCREMENT,
  `total_campaigns` int DEFAULT NULL,
  `donations_amount` decimal(15,2) NOT NULL,
@@ -63,27 +63,27 @@ CREATE TABLE `dashboard_statistics` (
  `total_users` int DEFAULT NULL,
  `up_date_time` datetime(6) DEFAULT NULL,
  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `donations` (
+TABLE `donations` (
  `id` bigint NOT NULL AUTO_INCREMENT,
+ `transaction_id` varchar(255) DEFAULT NULL,
  `amount` decimal(12,2) NOT NULL,
+ `bank_code` varchar(255) DEFAULT NULL,
  `created_at` datetime(6) DEFAULT NULL,
  `donor_email` varchar(255) DEFAULT NULL,
  `donor_name` varchar(255) DEFAULT NULL,
  `donor_phone` varchar(255) DEFAULT NULL,
  `is_anonymous` bit(1) DEFAULT NULL,
  `message` text,
+ `order_id` varchar(255) NOT NULL,
  `payment_date` datetime(6) DEFAULT NULL,
- `payment_method` enum('BANK_TRANSFER','CASH','MOMO','VNPAY','ZALOPAY') NOT NULL,
+ `payment_details` text,
+ `payment_method` enum('MOMO','VNPAY','ZALOPAY') NOT NULL,
  `payment_status` enum('COMPLETED','FAILED','PENDING','REFUNDED') DEFAULT NULL,
  `receipt_url` varchar(255) DEFAULT NULL,
+ `response_code` varchar(255) DEFAULT NULL,
  `updated_at` datetime(6) DEFAULT NULL,
- `vnp_bank_code` varchar(255) DEFAULT NULL,
- `vnp_bank_tran_no` varchar(255) DEFAULT NULL,
- `vnp_response_code` varchar(255) DEFAULT NULL,
- `vnp_transaction_no` varchar(255) DEFAULT NULL,
- `vnp_txn_ref` varchar(255) DEFAULT NULL,
  `campaign_id` bigint NOT NULL,
  `donor_id` int DEFAULT NULL,
  PRIMARY KEY (`id`),
@@ -92,9 +92,9 @@ CREATE TABLE `donations` (
  KEY `FKp8lwp38vg4a0v2y69d2krn562` (`donor_id`),
  CONSTRAINT `FKp8lwp38vg4a0v2y69d2krn562` FOREIGN KEY (`donor_id`) REFERENCES `users` (`id`),
  CONSTRAINT `FKr5m6trggwgkgoanlalgea1psh` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `messages` (
+TABLE `messages` (
  `id` int NOT NULL AUTO_INCREMENT,
  `content` longtext,
  `message_type` enum('ASSISTANT','SYSTEM','TOOL','USER') NOT NULL,
@@ -106,9 +106,9 @@ CREATE TABLE `messages` (
  KEY `FKpsmh6clh3csorw43eaodlqvkn` (`user_id`),
  CONSTRAINT `FKdumcu11xf8ldun8i4xpd04j43` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`),
  CONSTRAINT `FKpsmh6clh3csorw43eaodlqvkn` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `notifications` (
+TABLE `notifications` (
  `id` bigint NOT NULL AUTO_INCREMENT,
  `created_at` datetime(6) DEFAULT NULL,
  `is_read` bit(1) DEFAULT NULL,
@@ -121,9 +121,9 @@ CREATE TABLE `notifications` (
  PRIMARY KEY (`id`),
  KEY `FK9y21adhxn0ayjhfocscqox7bh` (`user_id`),
  CONSTRAINT `FK9y21adhxn0ayjhfocscqox7bh` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `organizers` (
+TABLE `organizers` (
  `organizer_id` int NOT NULL AUTO_INCREMENT,
  `description` longtext NOT NULL,
  `email` varchar(255) DEFAULT NULL,
@@ -134,9 +134,9 @@ CREATE TABLE `organizers` (
  `name` varchar(500) NOT NULL,
  `slug` varchar(255) DEFAULT NULL,
  PRIMARY KEY (`organizer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `users` (
+TABLE `users` (
  `id` int NOT NULL AUTO_INCREMENT,
  `avatarurl` varchar(255) DEFAULT NULL,
  `cover_photourl` varchar(255) DEFAULT NULL,
@@ -156,9 +156,9 @@ CREATE TABLE `users` (
  PRIMARY KEY (`id`),
  UNIQUE KEY `UK6dotkott2kjsp8vw4d0m25fb7` (`email`),
  UNIQUE KEY `UK9q63snka3mdh91as4io72espi` (`phone_number`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)
 
-CREATE TABLE `user_providers` (
+TABLE `user_providers` (
  `id` bigint NOT NULL AUTO_INCREMENT,
  `provider_id` varchar(255) DEFAULT NULL,
  `provider_name` enum('FACEBOOK','GOOGLE','LOCAL') NOT NULL,
@@ -166,4 +166,4 @@ CREATE TABLE `user_providers` (
  PRIMARY KEY (`id`),
  KEY `FKjn43qct6quty65mmawu66aesk` (`user_id`),
  CONSTRAINT `FKjn43qct6quty65mmawu66aesk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+)

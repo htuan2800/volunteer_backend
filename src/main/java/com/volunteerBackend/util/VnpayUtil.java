@@ -1,5 +1,6 @@
 package com.volunteerBackend.util;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -67,21 +68,33 @@ public class VnpayUtil {
     public static String hashAllFields(Map<String, String> fields, String secretKey) {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
+
         StringBuilder sb = new StringBuilder();
-        for (Iterator<String> itr = fieldNames.iterator(); itr.hasNext();) {
+        Iterator<String> itr = fieldNames.iterator();
+
+        while (itr.hasNext()) {
             String fieldName = itr.next();
             String fieldValue = fields.get(fieldName);
-            if (fieldValue != null && !fieldValue.isEmpty()) {
-                sb.append(fieldName).append("=").append(fieldValue);
-                if (itr.hasNext())
-                    sb.append("&");
+
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                try {
+                    sb.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                    sb.append("=");
+                    sb.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                sb.append("&");
             }
+        }
+        if (sb.length() > 0) {
+            sb.setLength(sb.length() - 1);
         }
         return hmacSHA512(secretKey, sb.toString());
     }
 
     public static String getIpAddress(HttpServletRequest request) {
-       String ipAdress;
+        String ipAdress;
         try {
             ipAdress = request.getHeader("X-FORWARDED-FOR");
             if (ipAdress == null) {

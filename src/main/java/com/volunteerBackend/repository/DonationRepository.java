@@ -7,18 +7,18 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+
 
 import com.volunteerBackend.model.Campaign;
 import com.volunteerBackend.model.Donation;
 import com.volunteerBackend.model.User;
 import com.volunteerBackend.type.PaymentStatus;
 
-@Repository
-public interface DonationRepository extends JpaRepository<Donation, Long> {
-    Donation findByVnpTxnRef(String vnpTxnRef);
 
-    List<Donation> findByDonorNameContaining(String donorName);
+public interface DonationRepository extends JpaRepository<Donation, Long> {
+    Donation findByOrderId(String orderId);
+
+    List<Donation> findByDonorNameContainingIgnoreCase(String donorName);
 
     List<Donation> findByCampaignIdAndPaymentStatus(Long campaignId, PaymentStatus paymentStatus);
 
@@ -135,4 +135,7 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
         @Param("donor") User donor,
         @Param("status") PaymentStatus status
     );
+
+    @Query("SELECT DISTINCT d.donor FROM Donation d WHERE d.campaign.id = :campaignId")
+    List<User> findDistincUsersByCampaignId(Long campaignId);
 }
